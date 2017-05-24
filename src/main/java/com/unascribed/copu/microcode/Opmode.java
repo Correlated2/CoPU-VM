@@ -46,7 +46,9 @@ public abstract class Opmode {
 	
 	private static final Opmode[] modes = {
 		new ImmediateOpmode(),
-		new RegisterOpmode()
+		new RegisterOpmode(),
+		new ImmediateAddressOpmode(),
+		new DirectAddressOpmode()
 	};
 	
 	public static Opmode dest() {
@@ -62,14 +64,14 @@ public abstract class Opmode {
 	}
 	
 	
-	public int fetch4(VirtualMachine vm, int operand) throws VMError {
+	public int get4(VirtualMachine vm, int operand) throws VMError {
 		throw new VMKernelPanic("This mode doesn't have a 4-bit operand");
 	}
-	public abstract int fetch12(VirtualMachine vm, int operand) throws VMError;
-	public int fetch20(VirtualMachine vm, int mode, int operand) throws VMError {
+	public abstract int get12(VirtualMachine vm, int operand) throws VMError;
+	public int get20(VirtualMachine vm, int mode, int operand) throws VMError {
 		throw new VMKernelPanic("20-bit operands are only in 3-arg r/m instructions which are not implemented.");
 	}
-	public abstract int fetch32(VirtualMachine vm, int operand) throws VMError;
+	public abstract int get32(VirtualMachine vm, int operand) throws VMError;
 	
 	public void put4(VirtualMachine vm, int operand, int data) throws VMError {
 		throw new VMKernelPanic("This mode doesn't have a 4-bit operand");
@@ -91,12 +93,12 @@ public abstract class Opmode {
 			return operand-1;
 		case REGISTER:
 			//.... ...r rrrr
-			return vm.getRegister(operand & 0b0000_0001_1111).getAsInt(); //Can trigger a userspace error from invalid register id
+			return vm.getRegister(operand & 0b0000_0001_1111).get(); //Can trigger a userspace error from invalid register id
 		case IMMEDIATE_ADDRESS: {
 			//piii iiii iiii
 			int pageID = operand & 0b1000_0000_0000;
 			Register pageRegister = (pageID==0) ? vm.registers().PG0 : vm.registers().PG1;
-			MemoryPage page = vm.getPage(pageRegister.getAsInt()); //This can trigger undefined behavior or a vm page fault
+			MemoryPage page = vm.getPage(pageRegister.get()); //This can trigger undefined behavior or a vm page fault
 			int address = operand & 0b0111_1111_1111;
 			return page.get(address); //It is UNLIKELY if not impossible to trigger a vm page fault here due to being restricted to 11 bits.
 		}
@@ -105,8 +107,8 @@ public abstract class Opmode {
 			int pageRegisterNum = (operand >> 7) & 0b0001_1111;
 			int ofsRegisterNum = operand &  0b0001_1111;
 			
-			int pageDescriptor = vm.getRegister(pageRegisterNum).getAsInt(); //Can trigger a userspace error from invalid register id
-			int ofs = vm.getRegister(ofsRegisterNum).getAsInt();             //Can trigger the same error for the same reason
+			int pageDescriptor = vm.getRegister(pageRegisterNum).get(); //Can trigger a userspace error from invalid register id
+			int ofs = vm.getRegister(ofsRegisterNum).get();             //Can trigger the same error for the same reason
 			MemoryPage page = vm.getPage(pageDescriptor);                    //Can trigger undefined behavior or a vm page fault
 			return page.get(ofs);                                            //Can trigger a vm page fault.
 		}
@@ -115,8 +117,8 @@ public abstract class Opmode {
 			int pageRegisterNum = (operand >> 7) & 0b0001_1111;
 			int ofsRegisterNum = operand &  0b0001_1111;
 			
-			int pageDescriptor = vm.getRegister(pageRegisterNum).getAsInt(); //Can trigger a userspace error from invalid register id
-			int ofs = vm.getRegister(ofsRegisterNum).getAsInt();             //Can trigger the same error for the same reason
+			int pageDescriptor = vm.getRegister(pageRegisterNum).get(); //Can trigger a userspace error from invalid register id
+			int ofs = vm.getRegister(ofsRegisterNum).get();             //Can trigger the same error for the same reason
 			MemoryPage page = vm.getPage(pageDescriptor);                    //Can trigger undefined behavior or a vm page fault
 			int deref = page.get(ofs);                                       //Can trigger a vm page fault.
 			return page.get(deref);                                          //Can trigger a vm page fault.
@@ -129,18 +131,18 @@ public abstract class Opmode {
 			
 			Register pageRegister = (pageRegisterNum==0) ? vm.registers().PG0 : vm.registers().PG1;
 			Register ofsRegister = vm.getRegister(ofsRegisterNum);
-			int pageDescriptor = pageRegister.getAsInt();
+			int pageDescriptor = pageRegister.get();
 			MemoryPage pg = vm.getPage(pageDescriptor);                     //Can trigger undefined behavior or a vm page fault
-			return pg.get(ofsRegister.getAsInt()+ofs);                      //Can trigger a vm page fault
+			return pg.get(ofsRegister.get()+ofs);                      //Can trigger a vm page fault
 		}
 		case DIRECT_POSTINC: {
 			//pppp p..r rrrr
 			int pageRegisterNum = (operand >> 7) & 0b0001_1111;
 			int ofsRegisterNum = operand &  0b0001_1111;
 			
-			int pageDescriptor = vm.getRegister(pageRegisterNum).getAsInt(); //Can trigger a userspace error from invalid register id
+			int pageDescriptor = vm.getRegister(pageRegisterNum).get(); //Can trigger a userspace error from invalid register id
 			Register ofsRegister = vm.getRegister(ofsRegisterNum);           //Can trigger the same error for the same reason
-			int ofs = ofsRegister.getAsInt();
+			int ofs = ofsRegister.get();
 			ofsRegister.accept(ofs+1); //This is technically super early for post-increment but it works as intended.
 			MemoryPage page = vm.getPage(pageDescriptor);                    //Can trigger undefined behavior or a vm page fault
 			return page.get(ofs);                                            //Can trigger a vm page fault.
@@ -149,19 +151,19 @@ public abstract class Opmode {
 			return ((operand & 0x0F) - 1) % 0x0F; //making sure that extra bits don't contribute to the outcome and 4-bit underflow happens
 		case REGISTER_B:
 			//.... ...r rrrr
-			return vm.getRegister(operand & 0b0000_0001_1111).getAsInt() & 0x0F; //Can trigger a userspace error from invalid register id
+			return vm.getRegister(operand & 0b0000_0001_1111).get() & 0x0F; //Can trigger a userspace error from invalid register id
 		case IMMEDIATE_ADDR_B:
 			//piii iiii iiii
 			int pageID = (operand >> 11) & 0b0000_0001;
 			Register pageRegister = (pageID==0) ? vm.registers().PG0 : vm.registers().PG1;
-			MemoryPage page = vm.getPage(pageRegister.getAsInt()); //This can trigger undefined behavior or a vm page fault
+			MemoryPage page = vm.getPage(pageRegister.get()); //This can trigger undefined behavior or a vm page fault
 			int address = operand & 0b0111_1111_1111;
 			return page.getByte(address); //It is UNLIKELY if not impossible to trigger a vm page fault here due to being restricted to 11 bits.
 		default:
 			throw new VMUserspaceError("Invalid instruction at "+ //page:offset
-					Integer.toHexString(vm.getRegister(10).getAsInt())+
+					Integer.toHexString(vm.getRegister(10).get())+
 					":"+
-					Integer.toHexString(vm.getRegister(8).getAsInt()));
+					Integer.toHexString(vm.getRegister(8).get()));
 		}
 	}
 	
@@ -171,12 +173,12 @@ public abstract class Opmode {
 			return operand;
 		case REGISTER:
 			//.... ....'.... ....'.... ....'...r rrrr
-			return vm.getRegister(operand & 0b0001_1111).getAsInt(); //Can trigger a userspace error from invalid register id
+			return vm.getRegister(operand & 0b0001_1111).get(); //Can trigger a userspace error from invalid register id
 		case IMMEDIATE_ADDRESS: {
 			//pppp ....'.... ....'.... .iii'iiii iiii
 			int pageID = operand & 0b1000_0000_0000;
 			Register pageRegister = (pageID==0) ? vm.registers().PG0 : vm.registers().PG1;
-			MemoryPage page = vm.getPage(pageRegister.getAsInt()); //This can trigger undefined behavior or a vm page fault
+			MemoryPage page = vm.getPage(pageRegister.get()); //This can trigger undefined behavior or a vm page fault
 			int address = operand & 0b0111_1111_1111;
 			return page.get(address); //It is UNLIKELY if not impossible to trigger a vm page fault here due to being restricted to 11 bits.
 		}
@@ -184,7 +186,7 @@ public abstract class Opmode {
 			return operand & 0x0F;
 		default:
 			throw new VMUserspaceError("Invalid instruction at "+
-					Integer.toHexString(vm.getRegister(8).getAsInt()));
+					Integer.toHexString(vm.getRegister(8).get()));
 		}
 	}
 }

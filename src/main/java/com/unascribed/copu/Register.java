@@ -34,7 +34,8 @@ public class Register implements IntSupplier, IntConsumer {
 		value = 0;
 	}
 	
-	@Override
+	
+	public int get() { return value; }
 	public int getAsInt() { return value; }
 	@Override
 	public void accept(int value) { this.value = value; }

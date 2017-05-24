@@ -7,13 +7,13 @@ import com.unascribed.copu.undefined.VMKernelPanic;
 public class ImmediateOpmode extends Opmode {
 
 	@Override
-	public int fetch12(VirtualMachine vm, int operand) throws VMError {
+	public int get12(VirtualMachine vm, int operand) throws VMError {
 		//iiii'iiii iiii
 		return operand & 0b1111_1111_1111;
 	}
 
 	@Override
-	public int fetch32(VirtualMachine vm, int operand) throws VMError {
+	public int get32(VirtualMachine vm, int operand) throws VMError {
 		//iiii iiii'iiii iiii'iiii iiii'iiii iiii
 		return operand;
 	}
