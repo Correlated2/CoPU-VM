@@ -50,7 +50,8 @@ public abstract class Opmode {
 		new OpmodeImmediateAddress(),
 		new OpmodeDirectAddress(),
 		new OpmodeIndirectAddress(),
-		new OpmodeDirectWithOffset()
+		new OpmodeDirectWithOffset(),
+		new OpmodeDirectWithPostIncrement()
 	};
 	
 	public static Opmode dest() {
