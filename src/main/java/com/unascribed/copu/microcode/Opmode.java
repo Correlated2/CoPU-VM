@@ -28,9 +28,10 @@ import com.unascribed.copu.MemoryPage;
 import com.unascribed.copu.Register;
 import com.unascribed.copu.VirtualMachine;
 import com.unascribed.copu.undefined.VMError;
+import com.unascribed.copu.undefined.VMKernelPanic;
 import com.unascribed.copu.undefined.VMUserspaceError;
 
-public class AddressingMode {
+public abstract class Opmode {
 	public static final int IMMEDIATE         = 0b0000;
 	public static final int REGISTER          = 0b0001;
 	public static final int IMMEDIATE_ADDRESS = 0b0010;
@@ -43,14 +44,51 @@ public class AddressingMode {
 	public static final int REGISTER_B        = 0b1001; //Documented but rarely used
 	public static final int IMMEDIATE_ADDR_B  = 0b1010; //Used sometimes for string manipulation
 	
-	public static int fetch4(VirtualMachine vm, int operand) throws VMError {
-		return vm.getRegister(operand).getAsInt();
+	private static final Opmode[] modes = {
+		new ImmediateOpmode(),
+		new RegisterOpmode()
+	};
+	
+	public static Opmode dest() {
+		return modes[1];
 	}
 	
-	public static int fetch12(VirtualMachine vm, int mode, int operand) throws VMError {
+	public static Opmode forId(int id) {
+		if (id<0 || id>=modes.length) {
+			return null;
+		}
+		
+		return modes[id];
+	}
+	
+	
+	public int fetch4(VirtualMachine vm, int operand) throws VMError {
+		throw new VMKernelPanic("This mode doesn't have a 4-bit operand");
+	}
+	public abstract int fetch12(VirtualMachine vm, int operand) throws VMError;
+	public int fetch20(VirtualMachine vm, int mode, int operand) throws VMError {
+		throw new VMKernelPanic("20-bit operands are only in 3-arg r/m instructions which are not implemented.");
+	}
+	public abstract int fetch32(VirtualMachine vm, int operand) throws VMError;
+	
+	public void put4(VirtualMachine vm, int operand, int data) throws VMError {
+		throw new VMKernelPanic("This mode doesn't have a 4-bit operand");
+	}
+	public abstract void put12(VirtualMachine vm, int operand, int data) throws VMError;
+	public void put20(VirtualMachine vm, int mode, int operand, int data) throws VMError {
+		throw new VMKernelPanic("20-bit operands are only in 3-arg r/m instructions which are not implemented.");
+	}
+	public abstract void put32(VirtualMachine vm, int operand, int data) throws VMError;
+
+	
+	
+	
+	
+	
+	public static int _fetch12(VirtualMachine vm, int mode, int operand) throws VMError {
 		switch(mode) {
 		case IMMEDIATE:
-			return operand;
+			return operand-1;
 		case REGISTER:
 			//.... ...r rrrr
 			return vm.getRegister(operand & 0b0000_0001_1111).getAsInt(); //Can trigger a userspace error from invalid register id
@@ -108,7 +146,7 @@ public class AddressingMode {
 			return page.get(ofs);                                            //Can trigger a vm page fault.
 		}
 		case IMMEDIATE_B:
-			return operand & 0x0F;
+			return ((operand & 0x0F) - 1) % 0x0F; //making sure that extra bits don't contribute to the outcome and 4-bit underflow happens
 		case REGISTER_B:
 			//.... ...r rrrr
 			return vm.getRegister(operand & 0b0000_0001_1111).getAsInt() & 0x0F; //Can trigger a userspace error from invalid register id
@@ -127,16 +165,21 @@ public class AddressingMode {
 		}
 	}
 	
-	public static int fetch20(VirtualMachine vm, int mode, int operand) throws VMError {
-		throw new VMUserspaceError("20-bit operands are only in 3-arg r/m instructions which are not implemented.");
-	}
-	
-	public static int fetch32(VirtualMachine vm, int mode, int operand) throws VMError {
+	public static int _fetch32(VirtualMachine vm, int mode, int operand) throws VMError {
 		switch(mode) {
 		case IMMEDIATE:
 			return operand;
 		case REGISTER:
-			return vm.getRegister(operand & 0x0F).getAsInt();
+			//.... ....'.... ....'.... ....'...r rrrr
+			return vm.getRegister(operand & 0b0001_1111).getAsInt(); //Can trigger a userspace error from invalid register id
+		case IMMEDIATE_ADDRESS: {
+			//pppp ....'.... ....'.... .iii'iiii iiii
+			int pageID = operand & 0b1000_0000_0000;
+			Register pageRegister = (pageID==0) ? vm.registers().PG0 : vm.registers().PG1;
+			MemoryPage page = vm.getPage(pageRegister.getAsInt()); //This can trigger undefined behavior or a vm page fault
+			int address = operand & 0b0111_1111_1111;
+			return page.get(address); //It is UNLIKELY if not impossible to trigger a vm page fault here due to being restricted to 11 bits.
+		}
 		case IMMEDIATE_B:
 			return operand & 0x0F;
 		default:

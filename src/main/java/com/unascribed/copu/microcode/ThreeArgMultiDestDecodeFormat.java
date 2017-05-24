@@ -26,27 +26,26 @@ package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
 import com.unascribed.copu.undefined.VMError;
+import com.unascribed.copu.undefined.VMKernelPanic;
 
 public class ThreeArgMultiDestDecodeFormat implements DecodeFormat {
-	/* [CCCC CCCC dddd dddd .... .... .... XXXX|xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx] */
+	/* [CCCC CCCC dddd aaaa .... .... .... XXXX|xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx] */
 	
 	@Override
 	public int loadA(VirtualMachine vm, int instructionHigh, int instructionLow) throws VMError {
 		int operand = (instructionHigh >> 16) & 0x0F;
-		return AddressingMode.fetch4(vm, operand);
+		return Opmode.dest().fetch4(vm, operand);
 	}
 
 	@Override
 	public int loadB(VirtualMachine vm, int instructionHigh, int instructionLow) throws VMError  {
-		int operand = instructionHigh & 0x0F;
-		int data = instructionLow;
-		return 0;
+		throw new VMKernelPanic("Accessed the 'b' operand from an instruction format which doesn't support it");
 	}
 
 	@Override
 	public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) throws VMError  {
-		// TODO Auto-generated method stub
-		
+		int operand = (instructionHigh >> 20) & 0x0F;
+		Opmode.dest().put4(vm, operand, value);
 	}
 
 }
