@@ -48,7 +48,9 @@ public abstract class Opmode {
 		new OpmodeImmediate(),
 		new OpmodeRegister(),
 		new OpmodeImmediateAddress(),
-		new OpmodeDirectAddress()
+		new OpmodeDirectAddress(),
+		new OpmodeIndirectAddress(),
+		new OpmodeDirectWithOffset()
 	};
 	
 	public static Opmode dest() {

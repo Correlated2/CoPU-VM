@@ -4,7 +4,7 @@ import com.unascribed.copu.MemoryPage;
 import com.unascribed.copu.VirtualMachine;
 import com.unascribed.copu.undefined.VMError;
 
-public class OpmodeDirectAddress extends Opmode {
+public class OpmodeIndirectAddress extends Opmode {
 
 	@Override
 	public int get12(VirtualMachine vm, int operand) throws VMError {
@@ -15,7 +15,8 @@ public class OpmodeDirectAddress extends Opmode {
 		int pageDescriptor = vm.getRegister(pageRegisterNum).get();
 		int ofs = vm.getRegister(ofsRegisterNum).get();
 		MemoryPage page = vm.getPage(pageDescriptor);
-		return page.get(ofs);
+		int deref = page.get(ofs);
+		return page.get(deref);
 	}
 
 	@Override
@@ -27,7 +28,8 @@ public class OpmodeDirectAddress extends Opmode {
 		int pageDescriptor = vm.getRegister(pageRegisterNum).get();
 		int ofs = vm.getRegister(ofsRegisterNum).get();
 		MemoryPage page = vm.getPage(pageDescriptor);
-		return page.get(ofs);
+		int deref = page.get(ofs);
+		return page.get(deref);
 	}
 
 	@Override
@@ -39,7 +41,8 @@ public class OpmodeDirectAddress extends Opmode {
 		int pageDescriptor = vm.getRegister(pageRegisterNum).get();
 		int ofs = vm.getRegister(ofsRegisterNum).get();
 		MemoryPage page = vm.getPage(pageDescriptor);
-		page.set(ofs, data);
+		int deref = page.get(ofs);
+		page.set(deref, data);
 	}
 
 	@Override
@@ -51,7 +54,8 @@ public class OpmodeDirectAddress extends Opmode {
 		int pageDescriptor = vm.getRegister(pageRegisterNum).get();
 		int ofs = vm.getRegister(ofsRegisterNum).get();
 		MemoryPage page = vm.getPage(pageDescriptor);
-		page.set(ofs, data);
+		int deref = page.get(ofs);
+		page.set(deref, data);
 	}
 
 }
