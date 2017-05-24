@@ -33,9 +33,9 @@ public interface DecodeFormat {
 	public static final int OP_REG = 0x01;
 	
 	public static final DecodeFormat NO_ARG  = new NullDecodeFormat();
-	public static final DecodeFormat ONE_ARG = new NullDecodeFormat();
-	public static final DecodeFormat ONE_ARG_IMM = new NullDecodeFormat();
-	public static final DecodeFormat ONE_ARG_DEST = new NullDecodeFormat();
+	public static final DecodeFormat ONE_ARG = new OneArgDecodeFormat();
+	public static final DecodeFormat ONE_ARG_IMM = new OneArgDecodeFormat();
+	public static final DecodeFormat ONE_ARG_DEST = new OneArgDestDecodeFormat();
 	public static final DecodeFormat TWO_ARG_RM = new NullDecodeFormat();
 	public static final DecodeFormat TWO_ARG_DEST = new NullDecodeFormat();
 	public static final DecodeFormat THREE_ARG_RM = new NullDecodeFormat(); //RARE / UNUSED
@@ -43,21 +43,21 @@ public interface DecodeFormat {
 	public static final DecodeFormat THREE_ARG_MULTI_DEST = new ThreeArgMultiDestDecodeFormat();
 	
 	
-	public int loadA(VirtualMachine host, int instructionHigh, int instructionLow) throws VMError;
-	public int loadB(VirtualMachine host, int instructionHigh, int instructionLow) throws VMError;
-	public void setDest(VirtualMachine host, int instructionHigh, int instructionLow, int value) throws VMError;
+	public int loadA(VirtualMachine vm, int instructionHigh, int instructionLow) throws VMError;
+	public int loadB(VirtualMachine vm, int instructionHigh, int instructionLow) throws VMError;
+	public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) throws VMError;
 	
 	public static class NullDecodeFormat implements DecodeFormat {
 		@Override
-		public int loadA(VirtualMachine host, int instructionHigh, int instructionLow) {
+		public int loadA(VirtualMachine vm, int instructionHigh, int instructionLow) {
 			throw new VMKernelPanic("Attempted to load 'a' arg for no-arg instruction!");
 		}
 		@Override
-		public int loadB(VirtualMachine host, int instructionHigh, int instructionLow) {
+		public int loadB(VirtualMachine vm, int instructionHigh, int instructionLow) {
 			throw new VMKernelPanic("Attempted to load 'b' arg for no-arg instruction!");
 		}
 		@Override
-		public void setDest(VirtualMachine host, int instructionHigh, int instructionLow, int value) {
+		public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) {
 			throw new VMKernelPanic("Attempted to set dest for no-arg instruction!");
 		}
 	}

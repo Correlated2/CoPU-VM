@@ -28,7 +28,7 @@ import com.unascribed.copu.VirtualMachine;
 import com.unascribed.copu.undefined.VMError;
 
 public class ThreeArgMultiDestDecodeFormat implements DecodeFormat {
-	/* [CCCC CCCC dddd aaaa .... .... .... XXXX|xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx] */
+	/* [CCCC CCCC dddd aaaa .... .... .... BBBB|bbbb bbbb bbbb bbbb bbbb bbbb bbbb bbbb] */
 	
 	@Override
 	public int loadA(VirtualMachine vm, int instructionHigh, int instructionLow) throws VMError {
