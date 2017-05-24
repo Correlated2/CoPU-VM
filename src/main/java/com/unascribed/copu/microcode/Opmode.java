@@ -45,10 +45,10 @@ public abstract class Opmode {
 	public static final int IMMEDIATE_ADDR_B  = 0b1010; //Used sometimes for string manipulation
 	
 	private static final Opmode[] modes = {
-		new ImmediateOpmode(),
-		new RegisterOpmode(),
-		new ImmediateAddressOpmode(),
-		new DirectAddressOpmode()
+		new OpmodeImmediate(),
+		new OpmodeRegister(),
+		new OpmodeImmediateAddress(),
+		new OpmodeDirectAddress()
 	};
 	
 	public static Opmode dest() {

@@ -3,7 +3,7 @@ package com.unascribed.copu.microcode;
 import com.unascribed.copu.VirtualMachine;
 import com.unascribed.copu.undefined.VMError;
 
-public class RegisterOpmode extends Opmode {
+public class OpmodeRegister extends Opmode {
 
 	public int get4(VirtualMachine vm, int operand) throws VMError {
 		//rrrr

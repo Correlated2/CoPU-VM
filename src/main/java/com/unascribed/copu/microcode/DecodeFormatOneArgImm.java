@@ -4,7 +4,7 @@ import com.unascribed.copu.VirtualMachine;
 import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMKernelPanic;
 
-public class OneArgImmDecodeFormat implements DecodeFormat {
+public class DecodeFormatOneArgImm implements DecodeFormat {
 
 	@Override
 	public int loadA(VirtualMachine vm, int instructionHigh, int instructionLow) throws VMError {

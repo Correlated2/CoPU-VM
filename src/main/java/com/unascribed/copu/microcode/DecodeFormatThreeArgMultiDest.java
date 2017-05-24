@@ -27,7 +27,7 @@ package com.unascribed.copu.microcode;
 import com.unascribed.copu.VirtualMachine;
 import com.unascribed.copu.undefined.VMError;
 
-public class ThreeArgMultiDestDecodeFormat implements DecodeFormat {
+public class DecodeFormatThreeArgMultiDest implements DecodeFormat {
 	/* [CCCC CCCC dddd aaaa .... .... .... BBBB|bbbb bbbb bbbb bbbb bbbb bbbb bbbb bbbb] */
 	
 	@Override

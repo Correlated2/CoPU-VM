@@ -33,14 +33,14 @@ public interface DecodeFormat {
 	public static final int OP_REG = 0x01;
 	
 	public static final DecodeFormat NO_ARG  = new NullDecodeFormat();
-	public static final DecodeFormat ONE_ARG = new OneArgDecodeFormat();
-	public static final DecodeFormat ONE_ARG_IMM = new OneArgDecodeFormat();
-	public static final DecodeFormat ONE_ARG_DEST = new OneArgDestDecodeFormat();
+	public static final DecodeFormat ONE_ARG = new DecodeFormatOneArg();
+	public static final DecodeFormat ONE_ARG_IMM = new DecodeFormatOneArg();
+	public static final DecodeFormat ONE_ARG_DEST = new DecodeFormatOneArgDest();
 	public static final DecodeFormat TWO_ARG_RM = new NullDecodeFormat();
 	public static final DecodeFormat TWO_ARG_DEST = new NullDecodeFormat();
 	public static final DecodeFormat THREE_ARG_RM = new NullDecodeFormat(); //RARE / UNUSED
 	public static final DecodeFormat THREE_ARG_DEST = new NullDecodeFormat();
-	public static final DecodeFormat THREE_ARG_MULTI_DEST = new ThreeArgMultiDestDecodeFormat();
+	public static final DecodeFormat THREE_ARG_MULTI_DEST = new DecodeFormatThreeArgMultiDest();
 	
 	
 	public int loadA(VirtualMachine vm, int instructionHigh, int instructionLow) throws VMError;

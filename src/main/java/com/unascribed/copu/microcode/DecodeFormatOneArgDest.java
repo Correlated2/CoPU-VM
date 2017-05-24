@@ -4,17 +4,17 @@ import com.unascribed.copu.VirtualMachine;
 import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMKernelPanic;
 
-public class OneArgDecodeFormat implements DecodeFormat {
+public class DecodeFormatOneArgDest implements DecodeFormat {
 
 	/*
-	 * [CCCC CCCC .... .... .... .... .... AAAA|aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa]
+	 * [CCCC CCCC dddd .... .... .... .... ....|.... .... .... .... .... .... .... ....]
 	 * One-arg has a special case: A and D are both the same operand, as some instructions read and other instructions write.
 	 */
 	
 	@Override
 	public int loadA(VirtualMachine vm, int instructionHigh, int instructionLow) throws VMError {
-		Opmode opmode = Opmode.forId(instructionHigh & 0x0F);
-		return opmode.get32(vm, instructionLow);
+		int regId = (instructionHigh >> 20) & 0x0F;
+		return vm.getRegister(regId).get();
 	}
 
 	@Override
@@ -24,7 +24,8 @@ public class OneArgDecodeFormat implements DecodeFormat {
 
 	@Override
 	public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) throws VMError {
-		Opmode opmode = Opmode.forId(instructionHigh & 0x0F);
-		opmode.put32(vm, instructionLow, value);
+		int regId = (instructionHigh >> 20) & 0x0F;
+		vm.getRegister(regId).accept(value);
 	}
+
 }

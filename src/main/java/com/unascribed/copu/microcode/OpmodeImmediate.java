@@ -4,7 +4,7 @@ import com.unascribed.copu.VirtualMachine;
 import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMKernelPanic;
 
-public class ImmediateOpmode extends Opmode {
+public class OpmodeImmediate extends Opmode {
 
 	@Override
 	public int get12(VirtualMachine vm, int operand) throws VMError {

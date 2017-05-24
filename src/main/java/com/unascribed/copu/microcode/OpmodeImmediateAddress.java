@@ -5,7 +5,7 @@ import com.unascribed.copu.Register;
 import com.unascribed.copu.VirtualMachine;
 import com.unascribed.copu.undefined.VMError;
 
-public class ImmediateAddressOpmode extends Opmode {
+public class OpmodeImmediateAddress extends Opmode {
 
 	@Override
 	public int get12(VirtualMachine vm, int operand) throws VMError {

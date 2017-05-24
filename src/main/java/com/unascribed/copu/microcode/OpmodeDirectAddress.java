@@ -4,7 +4,7 @@ import com.unascribed.copu.MemoryPage;
 import com.unascribed.copu.VirtualMachine;
 import com.unascribed.copu.undefined.VMError;
 
-public class DirectAddressOpmode extends Opmode {
+public class OpmodeDirectAddress extends Opmode {
 
 	@Override
 	public int get12(VirtualMachine vm, int operand) throws VMError {
