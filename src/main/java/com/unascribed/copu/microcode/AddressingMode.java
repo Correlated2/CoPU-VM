@@ -40,8 +40,8 @@ public class AddressingMode {
 	public static final int DIRECT_POSTINC    = 0b0110;
 	
 	public static final int IMMEDIATE_B       = 0b1000; //Unused, but fun undefined behavior
-	public static final int REGISTER_B        = 0b1001;
-	public static final int IMMEDIATE_ADDR_B  = 0b1010;
+	public static final int REGISTER_B        = 0b1001; //Documented but rarely used
+	public static final int IMMEDIATE_ADDR_B  = 0b1010; //Used sometimes for string manipulation
 	
 	public static int fetch4(VirtualMachine vm, int operand) throws VMError {
 		return vm.getRegister(operand).getAsInt();
@@ -54,19 +54,71 @@ public class AddressingMode {
 		case REGISTER:
 			//.... ...r rrrr
 			return vm.getRegister(operand & 0b0000_0001_1111).getAsInt(); //Can trigger a userspace error from invalid register id
-		case IMMEDIATE_ADDRESS:
-			//prrr rrrr rrrr
+		case IMMEDIATE_ADDRESS: {
+			//piii iiii iiii
 			int pageID = operand & 0b1000_0000_0000;
 			Register pageRegister = (pageID==0) ? vm.registers().PG0 : vm.registers().PG1;
 			MemoryPage page = vm.getPage(pageRegister.getAsInt()); //This can trigger undefined behavior or a vm page fault
 			int address = operand & 0b0111_1111_1111;
 			return page.get(address); //It is UNLIKELY if not impossible to trigger a vm page fault here due to being restricted to 11 bits.
-		case DIRECT_ADDRESS:
+		}
+		case DIRECT_ADDRESS: {
 			//pppp p..r rrrr
 			int pageRegisterNum = (operand >> 7) & 0b0001_1111;
 			int ofsRegisterNum = operand &  0b0001_1111;
+			
+			int pageDescriptor = vm.getRegister(pageRegisterNum).getAsInt(); //Can trigger a userspace error from invalid register id
+			int ofs = vm.getRegister(ofsRegisterNum).getAsInt();             //Can trigger the same error for the same reason
+			MemoryPage page = vm.getPage(pageDescriptor);                    //Can trigger undefined behavior or a vm page fault
+			return page.get(ofs);                                            //Can trigger a vm page fault.
+		}
+		case INDIRECT_ADDRESS: {
+			//pppp p..r rrrr
+			int pageRegisterNum = (operand >> 7) & 0b0001_1111;
+			int ofsRegisterNum = operand &  0b0001_1111;
+			
+			int pageDescriptor = vm.getRegister(pageRegisterNum).getAsInt(); //Can trigger a userspace error from invalid register id
+			int ofs = vm.getRegister(ofsRegisterNum).getAsInt();             //Can trigger the same error for the same reason
+			MemoryPage page = vm.getPage(pageDescriptor);                    //Can trigger undefined behavior or a vm page fault
+			int deref = page.get(ofs);                                       //Can trigger a vm page fault.
+			return page.get(deref);                                          //Can trigger a vm page fault.
+		}
+		case REG_WITH_OFFSET: {
+			//prrr riii iiii - note the dest syntax for the register
+			int pageRegisterNum = (operand >> 11) & 0b0000_0001;
+			int ofsRegisterNum  = (operand >>  7) & 0b0000_1111;
+			int ofs             = (operand      ) & 0b0111_1111;
+			
+			Register pageRegister = (pageRegisterNum==0) ? vm.registers().PG0 : vm.registers().PG1;
+			Register ofsRegister = vm.getRegister(ofsRegisterNum);
+			int pageDescriptor = pageRegister.getAsInt();
+			MemoryPage pg = vm.getPage(pageDescriptor);                     //Can trigger undefined behavior or a vm page fault
+			return pg.get(ofsRegister.getAsInt()+ofs);                      //Can trigger a vm page fault
+		}
+		case DIRECT_POSTINC: {
+			//pppp p..r rrrr
+			int pageRegisterNum = (operand >> 7) & 0b0001_1111;
+			int ofsRegisterNum = operand &  0b0001_1111;
+			
+			int pageDescriptor = vm.getRegister(pageRegisterNum).getAsInt(); //Can trigger a userspace error from invalid register id
+			Register ofsRegister = vm.getRegister(ofsRegisterNum);           //Can trigger the same error for the same reason
+			int ofs = ofsRegister.getAsInt();
+			ofsRegister.accept(ofs+1); //This is technically super early for post-increment but it works as intended.
+			MemoryPage page = vm.getPage(pageDescriptor);                    //Can trigger undefined behavior or a vm page fault
+			return page.get(ofs);                                            //Can trigger a vm page fault.
+		}
 		case IMMEDIATE_B:
 			return operand & 0x0F;
+		case REGISTER_B:
+			//.... ...r rrrr
+			return vm.getRegister(operand & 0b0000_0001_1111).getAsInt() & 0x0F; //Can trigger a userspace error from invalid register id
+		case IMMEDIATE_ADDR_B:
+			//piii iiii iiii
+			int pageID = (operand >> 11) & 0b0000_0001;
+			Register pageRegister = (pageID==0) ? vm.registers().PG0 : vm.registers().PG1;
+			MemoryPage page = vm.getPage(pageRegister.getAsInt()); //This can trigger undefined behavior or a vm page fault
+			int address = operand & 0b0111_1111_1111;
+			return page.getByte(address); //It is UNLIKELY if not impossible to trigger a vm page fault here due to being restricted to 11 bits.
 		default:
 			throw new VMUserspaceError("Invalid instruction at "+ //page:offset
 					Integer.toHexString(vm.getRegister(10).getAsInt())+
