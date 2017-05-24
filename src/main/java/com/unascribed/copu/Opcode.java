@@ -25,9 +25,11 @@
 package com.unascribed.copu;
 
 import com.unascribed.copu.microcode.DecodeFormat;
+import com.unascribed.copu.microcode.Instruction;
+import com.unascribed.copu.microcode.InstructionNOP;
 
 public enum Opcode {
-	NOP (0x00, DecodeFormat.NO_ARG),
+	NOP (0x00, DecodeFormat.NO_ARG, new InstructionNOP()),
 	CALL(0x01, DecodeFormat.TWO_ARG_RM),
 	
 	ADD (0x02, DecodeFormat.THREE_ARG_DEST),
@@ -82,12 +84,26 @@ public enum Opcode {
 	;
 	private final int value;
 	private final DecodeFormat format;
+	private final Instruction instruction;
 	
 	Opcode(int value, DecodeFormat format) {
 		this.value = value;
 		this.format = format;
+		this.instruction = null;
+	}
+	
+	Opcode(int value, DecodeFormat format, Instruction instruction) {
+		this.value = value;
+		this.format = format;
+		this.instruction = instruction;
 	}
 	
 	public int value() { return value; }
 	public DecodeFormat getDecodeFormat() { return format; }
+	public int exec(VirtualMachine vm, int high, int low) {
+		int cost = 1;
+		if (instruction!=null) cost += instruction.run(vm, format, high, low);
+		
+		return cost;
+	}
 }

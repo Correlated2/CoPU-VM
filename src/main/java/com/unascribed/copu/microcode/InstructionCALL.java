@@ -25,36 +25,20 @@
 package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
-import com.unascribed.copu.undefined.VMError;
-import com.unascribed.copu.undefined.VMKernelPanic;
 
-public class DecodeFormatOneArgDest implements DecodeFormat {
-
-	/*
-	 * [CCCC CCCC dddd .... .... .... .... ....|.... .... .... .... .... .... .... ....]
-	 * One-arg has a special case: A and D are both the same operand, as some instructions read and other instructions write.
-	 */
-	
-	@Override
-	public int getCost(int instructionHigh, int instructionLow) throws VMError {
-		return 0; //Dest is always zero-cost
-	}
-	
-	@Override
-	public int loadA(VirtualMachine vm, int instructionHigh, int instructionLow) throws VMError {
-		int regId = (instructionHigh >> 20) & 0x0F;
-		return vm.getRegister(regId).get();
-	}
+/** @Deprecated for now this instruction is a fancy NOP */
+@Deprecated
+public class InstructionCALL implements Instruction {
 
 	@Override
-	public int loadB(VirtualMachine vm, int instructionHigh, int instructionLow) throws VMError {
-		throw new VMKernelPanic("Tried to load nonexistant 'b' operand of a 1-arg instruction");
-	}
-
-	@Override
-	public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) throws VMError {
-		int regId = (instructionHigh >> 20) & 0x0F;
-		vm.getRegister(regId).accept(value);
+	public int run(VirtualMachine vm, DecodeFormat format, int high, int low) {
+		int moduleNamePtr = format.loadA(vm, high, low);
+		int methodNamePtr = format.loadB(vm, high, low);
+		
+		//TODO: Write up syntactic sugar to load up a String from a MemoryPage
+		//TODO: Write a module registry
+		//TODO: Rethink whether module names should be Strings or symbolic constant integers
+		return 0;
 	}
 
 }

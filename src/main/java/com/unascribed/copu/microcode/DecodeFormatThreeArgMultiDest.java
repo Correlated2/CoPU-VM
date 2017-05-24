@@ -31,6 +31,12 @@ public class DecodeFormatThreeArgMultiDest implements DecodeFormat {
 	/* [CCCC CCCC dddd aaaa .... .... .... BBBB|bbbb bbbb bbbb bbbb bbbb bbbb bbbb bbbb] */
 	
 	@Override
+	public int getCost(int instructionHigh, int instructionLow) throws VMError {
+		Opmode opmode = Opmode.forId(instructionHigh & 0x0F);
+		return opmode.getCost();
+	}
+	
+	@Override
 	public int loadA(VirtualMachine vm, int instructionHigh, int instructionLow) throws VMError {
 		int operand = (instructionHigh >> 16) & 0x0F;
 		return Opmode.dest().get4(vm, operand);

@@ -24,13 +24,15 @@
 
 package com.unascribed.copu;
 
+import java.util.ArrayDeque;
+
 import com.unascribed.copu.undefined.VMKernelPanic;
 import com.unascribed.copu.undefined.VMPageFault;
 
 public class VirtualMachine {
-	private boolean ok = true;
 	private RegisterFile registers = new RegisterFile();
 	private MemoryPage[] localDescriptorTable = new MemoryPage[16];
+	private ArrayDeque<Integer> stack = new ArrayDeque<>();
 	
 	public RegisterFile registers() {
 		return registers;
@@ -50,4 +52,6 @@ public class VirtualMachine {
 		}
 		return result;
 	}
+	
+	public ArrayDeque<Integer> stack() { return stack; }
 }

@@ -39,12 +39,17 @@ public interface DecodeFormat {
 	public static final DecodeFormat THREE_ARG_DEST = new DecodeFormatThreeArgDest();
 	public static final DecodeFormat THREE_ARG_MULTI_DEST = new DecodeFormatThreeArgMultiDest();
 	
-	
+	public int getCost(int instructionHigh, int instructionLow);
 	public int loadA(VirtualMachine vm, int instructionHigh, int instructionLow) throws VMError;
 	public int loadB(VirtualMachine vm, int instructionHigh, int instructionLow) throws VMError;
 	public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) throws VMError;
 	
 	public static class NullDecodeFormat implements DecodeFormat {
+		@Override
+		public int getCost(int instructionHigh, int instructionLow) throws VMError {
+			return 0;
+		}
+		
 		@Override
 		public int loadA(VirtualMachine vm, int instructionHigh, int instructionLow) {
 			throw new VMKernelPanic("Attempted to load 'a' arg for no-arg instruction!");

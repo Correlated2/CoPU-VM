@@ -66,6 +66,7 @@ public abstract class Opmode {
 		return modes[id];
 	}
 	
+	public abstract int getCost();
 	
 	public int get4(VirtualMachine vm, int operand) throws VMError {
 		throw new VMKernelPanic("This mode doesn't have a 4-bit operand");
