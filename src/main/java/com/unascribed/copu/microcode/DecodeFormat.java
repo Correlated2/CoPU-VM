@@ -29,17 +29,14 @@ import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMKernelPanic;
 
 public interface DecodeFormat {
-	public static final int OP_IMM = 0x00;
-	public static final int OP_REG = 0x01;
-	
 	public static final DecodeFormat NO_ARG  = new NullDecodeFormat();
 	public static final DecodeFormat ONE_ARG = new DecodeFormatOneArg();
 	public static final DecodeFormat ONE_ARG_IMM = new DecodeFormatOneArg();
 	public static final DecodeFormat ONE_ARG_DEST = new DecodeFormatOneArgDest();
-	public static final DecodeFormat TWO_ARG_RM = new NullDecodeFormat();
-	public static final DecodeFormat TWO_ARG_DEST = new NullDecodeFormat();
-	public static final DecodeFormat THREE_ARG_RM = new NullDecodeFormat(); //RARE / UNUSED
-	public static final DecodeFormat THREE_ARG_DEST = new NullDecodeFormat();
+	public static final DecodeFormat TWO_ARG_RM = new DecodeFormatTwoArgRM();
+	public static final DecodeFormat TWO_ARG_DEST = new DecodeFormatTwoArgDest();
+	public static final DecodeFormat THREE_ARG_RM = new DecodeFormatThreeArgRM(); //RARE / UNUSED
+	public static final DecodeFormat THREE_ARG_DEST = new DecodeFormatThreeArgDest();
 	public static final DecodeFormat THREE_ARG_MULTI_DEST = new DecodeFormatThreeArgMultiDest();
 	
 	

@@ -68,18 +68,12 @@ public abstract class Opmode {
 		throw new VMKernelPanic("This mode doesn't have a 4-bit operand");
 	}
 	public abstract int get12(VirtualMachine vm, int operand) throws VMError;
-	public int get20(VirtualMachine vm, int mode, int operand) throws VMError {
-		throw new VMKernelPanic("20-bit operands are only in 3-arg r/m instructions which are not implemented.");
-	}
 	public abstract int get32(VirtualMachine vm, int operand) throws VMError;
 	
 	public void put4(VirtualMachine vm, int operand, int data) throws VMError {
 		throw new VMKernelPanic("This mode doesn't have a 4-bit operand");
 	}
 	public abstract void put12(VirtualMachine vm, int operand, int data) throws VMError;
-	public void put20(VirtualMachine vm, int mode, int operand, int data) throws VMError {
-		throw new VMKernelPanic("20-bit operands are only in 3-arg r/m instructions which are not implemented.");
-	}
 	public abstract void put32(VirtualMachine vm, int operand, int data) throws VMError;
 
 	
