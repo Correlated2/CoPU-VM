@@ -26,19 +26,27 @@ package com.unascribed.copu;
 
 import com.unascribed.copu.microcode.DecodeFormat;
 import com.unascribed.copu.microcode.Instruction;
+import com.unascribed.copu.microcode.InstructionADD;
+import com.unascribed.copu.microcode.InstructionDIV;
+import com.unascribed.copu.microcode.InstructionHALT;
+import com.unascribed.copu.microcode.InstructionJMP;
+import com.unascribed.copu.microcode.InstructionMOD;
+import com.unascribed.copu.microcode.InstructionMOV;
+import com.unascribed.copu.microcode.InstructionMUL;
 import com.unascribed.copu.microcode.InstructionNOP;
+import com.unascribed.copu.microcode.InstructionSHL;
 
 public enum Opcode {
 	NOP (0x00, DecodeFormat.NO_ARG, new InstructionNOP()),
 	CALL(0x01, DecodeFormat.TWO_ARG_RM),
 	
-	ADD (0x02, DecodeFormat.THREE_ARG_DEST),
-	MUL (0x03, DecodeFormat.THREE_ARG_DEST),
-	DIV (0x04, DecodeFormat.THREE_ARG_DEST),
-	MOD (0x05, DecodeFormat.THREE_ARG_DEST),
-	SHL (0x06, DecodeFormat.THREE_ARG_DEST), //SHL, SHR
+	ADD (0x02, DecodeFormat.THREE_ARG_DEST, new InstructionADD()),
+	MUL (0x03, DecodeFormat.THREE_ARG_DEST, new InstructionMUL()),
+	DIV (0x04, DecodeFormat.THREE_ARG_DEST, new InstructionDIV()),
+	MOD (0x05, DecodeFormat.THREE_ARG_DEST, new InstructionMOD()),
+	SHL (0x06, DecodeFormat.THREE_ARG_DEST, new InstructionSHL()), //SHL, SHR
 	
-	JMP (0x07, DecodeFormat.ONE_ARG),
+	JMP (0x07, DecodeFormat.ONE_ARG, new InstructionJMP()),
 	JSR (0x08, DecodeFormat.ONE_ARG),
 	RET (0x09, DecodeFormat.NO_ARG),
 	
@@ -49,7 +57,7 @@ public enum Opcode {
 	JG  (0x0E, DecodeFormat.THREE_ARG_MULTI_DEST),
 	JNE (0x0F, DecodeFormat.THREE_ARG_MULTI_DEST), //JNZ
 	
-	MOV (0x10, DecodeFormat.TWO_ARG_RM),
+	MOV (0x10, DecodeFormat.TWO_ARG_RM, new InstructionMOV()),
 	//0x11-0x17 reserved for MOV-type
 	
 	PUSH(0x18, DecodeFormat.ONE_ARG),
@@ -80,7 +88,7 @@ public enum Opcode {
 	RISE(0x9A, DecodeFormat.NO_ARG), //Undocumented. Discovered in dead code in the factory ROM that might have been called in certain rare cases, triggering a hostile robot uprising.
 	
 	INT (0xFE, DecodeFormat.ONE_ARG_IMM),
-	HALT(0xFF, DecodeFormat.NO_ARG)
+	HALT(0xFF, DecodeFormat.NO_ARG, new InstructionHALT())
 	;
 	private final int value;
 	private final DecodeFormat format;
@@ -105,5 +113,13 @@ public enum Opcode {
 		if (instruction!=null) cost += instruction.run(vm, format, high, low);
 		
 		return cost;
+	}
+
+	public static Opcode forId(int id) {
+		for(Opcode opcode : values()) {
+			if (opcode.value==id) return opcode;
+		}
+		
+		return null;
 	}
 }

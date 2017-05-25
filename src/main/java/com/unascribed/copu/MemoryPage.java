@@ -36,6 +36,10 @@ public class MemoryPage {
 		this.data = new byte[0];
 	}
 	
+	public MemoryPage(byte[] program) {
+		this.data = program;
+	}
+
 	public int getByte(int addr) throws VMError {
 		if (addr<0 || addr>=PAGE_SIZE) {
 			throw new VMPageFault("Invalid page access at "+Integer.toHexString(addr));

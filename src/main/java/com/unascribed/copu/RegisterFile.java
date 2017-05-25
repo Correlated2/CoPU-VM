@@ -33,8 +33,8 @@ public class RegisterFile {
 	public final Register R5 = new Register();
 	public final Register R6 = new Register();
 	public final Register R7 = new Register();
-	public final Register IP = new Register();
-	public final Register SP = new Register(); //Synthetic, somewhat unreliable to tamper with or query.
+	public final Register X  = new Register();
+	public final Register Y  = new Register();
 	public final Register PG0= new Register();
 	public final Register PG1= new Register();
 	public final Register F0 = new Register();
@@ -42,8 +42,13 @@ public class RegisterFile {
 	public final Register F2 = new Register();
 	public final Register F3 = new Register();
 	
+	public final Register CS = new Register();
+	public final Register IP = new Register();
+	public final Register SP = new Register(); //Synthetic, somewhat unreliable to tamper with or query.
+	
 	public final Register[] table = {
 			R0, R1, R2, R3, R4, R5, R6, R7,
-			IP, SP, PG0,PG1,F0, F1, F2, F3
+			X,  Y,  PG0,PG1,F0, F1, F2, F3,
+			CS, IP, SP
 	};
 }

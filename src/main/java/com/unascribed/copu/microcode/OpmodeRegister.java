@@ -52,6 +52,11 @@ public class OpmodeRegister extends Opmode {
 	}
 
 	@Override
+	public void put4(VirtualMachine vm, int operand, int data) throws VMError {
+		vm.getRegister(operand & 0b0000_1111).accept(data);
+	}
+	
+	@Override
 	public void put12(VirtualMachine vm, int operand, int data) throws VMError {
 		//....'...r rrrr
 		vm.getRegister(operand & 0b0001_1111).accept(data);

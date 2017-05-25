@@ -27,5 +27,7 @@ package com.unascribed.copu.microcode;
 import com.unascribed.copu.VirtualMachine;
 
 public interface Instruction {
+	public static final int FPU_COST = 8;
+	
 	public abstract int run(VirtualMachine vm, DecodeFormat format, int high, int low);
 }

@@ -26,13 +26,17 @@ package com.unascribed.copu;
 
 import java.util.ArrayDeque;
 
+import com.unascribed.copu.microcode.HardwareLimits;
+import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMKernelPanic;
 import com.unascribed.copu.undefined.VMPageFault;
+import com.unascribed.copu.undefined.VMUserspaceError;
 
 public class VirtualMachine {
 	private RegisterFile registers = new RegisterFile();
 	private MemoryPage[] localDescriptorTable = new MemoryPage[16];
 	private ArrayDeque<Integer> stack = new ArrayDeque<>();
+	private int cooldown = HardwareLimits.COST_BRANCH_STALL; //There's been no chance to fill the pipeline.
 	
 	public RegisterFile registers() {
 		return registers;
@@ -48,10 +52,38 @@ public class VirtualMachine {
 		MemoryPage result = localDescriptorTable[descriptor];
 		if (result==null) {
 			//TODO: This is the sort of error that typically bricks machines before they can bluescreen. This would be a FANTASTIC opportunity for undefined behavior.
-			throw new VMPageFault("");
+			throw new VMPageFault("Invalid page descriptor "+Integer.toHexString(descriptor));
 		}
 		return result;
 	}
 	
 	public ArrayDeque<Integer> stack() { return stack; }
+	
+	public void loadProgram(byte[] program) {
+		MemoryPage programPage = new MemoryPage(program);
+		localDescriptorTable[0] = programPage;
+	}
+	
+	public void runCycle() throws VMError {
+		if (cooldown<=0) {
+			int cs = registers.CS.get();
+			int ip = registers.IP.get();
+			MemoryPage memory = getPage(cs);
+			int high = memory.get(ip);
+			int low = memory.get(ip+4);
+			registers.IP.accept(ip+8);
+			
+			int opid = (high >> 24) & 0xFF;
+			Opcode opcode = Opcode.forId(opid);
+			if (opcode==null) {
+				throw new VMUserspaceError("Invalid instruction at MEM[CS:"+
+					Integer.toHexString(ip)+ "]");
+			} else {
+				System.out.println("VMExec: MEM["+Integer.toHexString(ip)+"]: "+opcode.name());
+				int cost = opcode.exec(this, high, low);
+				cooldown += cost;
+			}
+		}
+		cooldown--;
+	}
 }
