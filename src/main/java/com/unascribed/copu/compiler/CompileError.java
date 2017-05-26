@@ -1,5 +1,7 @@
 package com.unascribed.copu.compiler;
 
+import com.unascribed.copu.Language;
+
 public class CompileError extends Exception {
 	private static final long serialVersionUID = 9069523428324147254L;
 	
@@ -19,4 +21,12 @@ public class CompileError extends Exception {
 	}
 	
 	public int getLine() { return line; }
+	public CompileError setLine(int line) {
+		this.line = line;
+		return this;
+	}
+	
+	public static CompileError withKey(String localizationKey) {
+		return new CompileError(Language.getCurrent().localize(localizationKey));
+	}
 }

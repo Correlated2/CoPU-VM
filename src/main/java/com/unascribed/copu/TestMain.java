@@ -38,8 +38,6 @@ public class TestMain {
 			error.printStackTrace();
 		}
 		
-		//System.out.println("Emitted program: "+Arrays.toString(program));
-		
 		VirtualMachine machine = new VirtualMachine();
 		machine.loadProgram(program);
 		

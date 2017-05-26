@@ -25,6 +25,7 @@
 package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
+import com.unascribed.copu.compiler.CompileError;
 import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMKernelPanic;
 
@@ -57,5 +58,44 @@ public class OpmodeImmediate extends Opmode {
 		throw new VMKernelPanic("Attempted to set an immediate operand");
 	}
 
+	@Override
+	public boolean canAssemble(Object o) {
+		return
+				o instanceof Integer ||
+				o instanceof Float;
+	}
 	
+	@Override
+	public long assemble12(Object o) throws CompileError {
+		if (o instanceof Integer) {
+			long operand = ((Integer) o).intValue();
+			if (operand>0xFF_FFFF) throw CompileError.withKey("err.validate.argTooLarge");
+			operand |= (((long)Opmode.IMMEDIATE) << 12);
+			return operand;
+		}
+		if (o instanceof Float) {
+			//Can never fit immediate float in 12-bit fields.
+			throw CompileError.withKey("err.validate.argTooLarge");
+		}
+		
+		throw CompileError.withKey("err.assembler.wrongType");
+	}
+	
+	@Override
+	public long assemble32(Object o) throws CompileError {
+		if (o instanceof Integer) {
+			long operand = ((Integer) o).intValue();
+			operand &= 0xFFFF_FFFFL;
+			operand |= (((long)Opmode.IMMEDIATE) << 32);
+			return operand;
+		}
+		if (o instanceof Float) {
+			long operand = Float.floatToIntBits(((Float) o).floatValue());
+			operand &= 0xFFFF_FFFFL;
+			operand |= (((long)Opmode.IMMEDIATE) << 32);
+			return operand;
+		}
+		
+		throw CompileError.withKey("err.assembler.wrongType");
+	}
 }
