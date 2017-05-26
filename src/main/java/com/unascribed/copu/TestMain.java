@@ -3,7 +3,7 @@ package com.unascribed.copu;
 import java.util.Arrays;
 
 import com.unascribed.copu.compiler.CompileError;
-import com.unascribed.copu.compiler.Compiler;
+import com.unascribed.copu.compiler.Assembler;
 import com.unascribed.copu.undefined.VMError;
 
 public class TestMain {
@@ -27,7 +27,7 @@ public class TestMain {
 	public static void main(String[] args) {
 		byte[] program = new byte[0];
 		
-		Compiler compiler = new Compiler();
+		Assembler compiler = new Assembler();
 		try {
 			compiler.parse(testPreCompile);
 			program = compiler.toByteArray();

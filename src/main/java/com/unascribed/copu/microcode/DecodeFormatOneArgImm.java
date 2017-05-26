@@ -26,7 +26,7 @@ package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
 import com.unascribed.copu.compiler.CompileError;
-import com.unascribed.copu.compiler.Label;
+import com.unascribed.copu.compiler.ZeroPageAddress;
 import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMKernelPanic;
 
@@ -64,8 +64,8 @@ public class DecodeFormatOneArgImm implements DecodeFormat {
 			operand = ((Integer) a).longValue();
 		} else if (a instanceof Float) {
 			operand = Float.floatToIntBits(((Float)a).floatValue());
-		} else if (a instanceof Label) {
-			operand = ((Label)a).value;
+		} else if (a instanceof ZeroPageAddress) {
+			operand = ((ZeroPageAddress)a).value;
 		}
 		
 		operand &= 0xFFFFFFFF;

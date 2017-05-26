@@ -26,7 +26,7 @@ package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
 import com.unascribed.copu.compiler.CompileError;
-import com.unascribed.copu.compiler.Label;
+import com.unascribed.copu.compiler.ZeroPageAddress;
 import com.unascribed.copu.compiler.RegisterToken;
 import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMKernelPanic;
@@ -81,9 +81,9 @@ public class DecodeFormatOneArg implements DecodeFormat {
 		} else if (a instanceof Float) {
 			opmode = Opmode.IMMEDIATE;
 			operand = Float.floatToIntBits(((Float)a).floatValue());
-		} else if (a instanceof Label) {
+		} else if (a instanceof ZeroPageAddress) {
 			opmode = Opmode.IMMEDIATE_ADDRESS;
-			operand = ((Label)a).value;
+			operand = ((ZeroPageAddress)a).value;
 		}
 		
 		//Just to be safe, make sure we can't clobber bits we don't own.

@@ -26,7 +26,7 @@ package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
 import com.unascribed.copu.compiler.CompileError;
-import com.unascribed.copu.compiler.Label;
+import com.unascribed.copu.compiler.ZeroPageAddress;
 import com.unascribed.copu.compiler.RegisterToken;
 import com.unascribed.copu.undefined.VMError;
 
@@ -85,8 +85,8 @@ public class DecodeFormatTwoArgRM implements DecodeFormat {
 		} else if (aObj instanceof Float) {
 			a = Float.floatToIntBits(((Float)aObj).floatValue());
 			a |= ((long)Opmode.IMMEDIATE) << 32;
-		} else if (aObj instanceof Label) {
-			a = ((Label)aObj).value;
+		} else if (aObj instanceof ZeroPageAddress) {
+			a = ((ZeroPageAddress)aObj).value;
 			a |= ((long)Opmode.IMMEDIATE_ADDRESS) << 32;
 		} else {
 			throw new CompileError("WAT", line);

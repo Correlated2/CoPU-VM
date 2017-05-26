@@ -3,26 +3,17 @@ package com.unascribed.copu.compiler;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.unascribed.copu.Opcode;
-import com.unascribed.copu.microcode.DecodeFormat;
 
-public class Compiler {
+public class Assembler {
 	private static final String[] dataCodes = {
 		"dc", "db", "dw", "df", "const"
 	};
 	
-	private static final String[] registerKeywords = {
-		"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7",
-		"f0", "f1", "f2", "f3"
-	};
-	
 	private ByteArrayOutputStream result = new ByteArrayOutputStream();
 	private DataOutputStream output = new DataOutputStream(result);
-	private ArrayList<Integer> microcodes = new ArrayList<>();
 	private HashMap<String, Integer> namedAddresses = new HashMap<>();
 	
 	public void parse(String[] input) throws CompileError {
@@ -188,7 +179,7 @@ public class Compiler {
 		}
 		
 		if (namedAddresses.containsKey(arg)) {
-			return new Label(arg, namedAddresses.get(arg));
+			return new ZeroPageAddress(namedAddresses.get(arg));
 		}
 		
 		RegisterToken reg = RegisterToken.forName(arg);
