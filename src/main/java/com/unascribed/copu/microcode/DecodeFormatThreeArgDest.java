@@ -25,6 +25,7 @@
 package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
+import com.unascribed.copu.compiler.CompileError;
 import com.unascribed.copu.undefined.VMError;
 
 public class DecodeFormatThreeArgDest implements DecodeFormat {
@@ -56,6 +57,15 @@ public class DecodeFormatThreeArgDest implements DecodeFormat {
 	public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) throws VMError {
 		int operand = (instructionHigh >> 20) & 0x0F;
 		Opmode.dest().put4(vm, operand, value);
+	}
+
+	@Override
+	public long compile(Object[] args, int line) throws CompileError {
+		if (args.length<2) throw new CompileError("Not enough arguments.", line);
+		
+		throw new CompileError("Not yet implemented.", line);
+		
+		
 	}
 
 }

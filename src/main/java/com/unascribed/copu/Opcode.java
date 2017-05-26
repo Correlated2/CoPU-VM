@@ -28,6 +28,7 @@ import com.unascribed.copu.microcode.DecodeFormat;
 import com.unascribed.copu.microcode.Instruction;
 import com.unascribed.copu.microcode.InstructionADD;
 import com.unascribed.copu.microcode.InstructionDIV;
+import com.unascribed.copu.microcode.InstructionFSIN;
 import com.unascribed.copu.microcode.InstructionHALT;
 import com.unascribed.copu.microcode.InstructionJMP;
 import com.unascribed.copu.microcode.InstructionMOD;
@@ -73,7 +74,7 @@ public enum Opcode {
 	ITOF(0x26, DecodeFormat.TWO_ARG_DEST), //converts an int to a float and places it into a register
 	FTOI(0x27, DecodeFormat.TWO_ARG_DEST), //converts a float to an int (by truncating it) and places it into a register
 	
-	FSIN(0x28, DecodeFormat.TWO_ARG_DEST),
+	FSIN(0x28, DecodeFormat.TWO_ARG_DEST, new InstructionFSIN()),
 	FCOS(0x29, DecodeFormat.TWO_ARG_DEST),
 	FTAN(0x2A, DecodeFormat.TWO_ARG_DEST),
 	//0x2B-0x2F reserved for floating-point instructions

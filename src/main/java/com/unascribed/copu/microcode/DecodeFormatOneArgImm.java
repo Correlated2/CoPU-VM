@@ -25,6 +25,8 @@
 package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
+import com.unascribed.copu.compiler.CompileError;
+import com.unascribed.copu.compiler.Label;
 import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMKernelPanic;
 
@@ -48,7 +50,26 @@ public class DecodeFormatOneArgImm implements DecodeFormat {
 	@Override
 	public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) throws VMError {
 		throw new VMKernelPanic("Attempted to set nonexistant destination of an immediate-mode instruction.");
-		
 	}
-	
+
+	@Override
+	public long compile(Object[] args, int line) throws CompileError {
+		if (args.length>1) throw new CompileError("Too many arguments.", line);
+		if (args.length<1) throw new CompileError("Too few arguments.", line);
+		
+		Object a = args[0];
+		long operand = 0L;
+		
+		if (a instanceof Integer) {
+			operand = ((Integer) a).longValue();
+		} else if (a instanceof Float) {
+			operand = Float.floatToIntBits(((Float)a).floatValue());
+		} else if (a instanceof Label) {
+			operand = ((Label)a).value;
+		}
+		
+		operand &= 0xFFFFFFFF;
+		
+		return operand;
+	}
 }

@@ -25,6 +25,8 @@
 package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
+import com.unascribed.copu.compiler.CompileError;
+import com.unascribed.copu.compiler.RegisterToken;
 import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMKernelPanic;
 
@@ -55,6 +57,22 @@ public class DecodeFormatOneArgDest implements DecodeFormat {
 	public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) throws VMError {
 		int regId = (instructionHigh >> 20) & 0x0F;
 		vm.getRegister(regId).accept(value);
+	}
+
+	@Override
+	public long compile(Object[] args, int line) throws CompileError {
+		if (args.length>1) throw new CompileError("Too many arguments.", line);
+		if (args.length<1) throw new CompileError("Too few arguments.", line);
+		
+		Object a = args[0];
+		if (!(a instanceof RegisterToken)) throw new CompileError("This instruction can only take a register argument.", line);
+		
+		long result = 0L;
+		long operand = ((RegisterToken)a).ordinal();
+		if (operand>=16) throw new CompileError("This instruction is ineligible for register "+a.toString(), line);
+		result |= (operand << (32+20));
+		
+		return result;
 	}
 
 }

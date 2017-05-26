@@ -79,7 +79,7 @@ public class VirtualMachine {
 				throw new VMUserspaceError("Invalid instruction at MEM[CS:"+
 					Integer.toHexString(ip)+ "]");
 			} else {
-				System.out.println("VMExec: MEM["+Integer.toHexString(ip)+"]: "+opcode.name());
+				System.out.println("VMExec: MEM["+Integer.toHexString(ip)+"]("+Integer.toHexString(opid)+"): "+opcode.name());
 				int cost = opcode.exec(this, high, low);
 				cooldown += cost;
 			}

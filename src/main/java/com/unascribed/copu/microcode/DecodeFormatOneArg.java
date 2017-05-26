@@ -25,6 +25,9 @@
 package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
+import com.unascribed.copu.compiler.CompileError;
+import com.unascribed.copu.compiler.Label;
+import com.unascribed.copu.compiler.RegisterToken;
 import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMKernelPanic;
 
@@ -56,5 +59,41 @@ public class DecodeFormatOneArg implements DecodeFormat {
 	public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) throws VMError {
 		Opmode opmode = Opmode.forId(instructionHigh & 0x0F);
 		opmode.put32(vm, instructionLow, value);
+	}
+
+	@Override
+	public long compile(Object[] args, int line) throws CompileError {
+		if (args.length>1) throw new CompileError("Too many arguments.", line);
+		if (args.length<1) throw new CompileError("Too few arguments.", line);
+		
+		Object a = args[0];
+		
+		long result = 0L;
+		long opmode = 0L;
+		long operand = 0L;
+		
+		if (a instanceof RegisterToken) {
+			opmode = Opmode.REGISTER;
+			operand = ((RegisterToken) a).ordinal();
+		} else if (a instanceof Integer) {
+			opmode = Opmode.IMMEDIATE;
+			operand = ((Integer)a).longValue();
+		} else if (a instanceof Float) {
+			opmode = Opmode.IMMEDIATE;
+			operand = Float.floatToIntBits(((Float)a).floatValue());
+		} else if (a instanceof Label) {
+			opmode = Opmode.IMMEDIATE_ADDRESS;
+			operand = ((Label)a).value;
+		}
+		
+		//Just to be safe, make sure we can't clobber bits we don't own.
+		opmode &= 0x0F;
+		operand &= 0xFFFFFFFF;
+		
+		//Stuff them into the A param
+		result |= (opmode << 32);
+		result |= (operand);
+		
+		return result;
 	}
 }

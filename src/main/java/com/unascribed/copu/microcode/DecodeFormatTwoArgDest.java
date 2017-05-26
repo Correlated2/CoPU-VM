@@ -24,7 +24,10 @@
 
 package com.unascribed.copu.microcode;
 
+import com.unascribed.copu.Language;
 import com.unascribed.copu.VirtualMachine;
+import com.unascribed.copu.compiler.CompileError;
+import com.unascribed.copu.compiler.RegisterToken;
 import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMKernelPanic;
 
@@ -53,6 +56,59 @@ public class DecodeFormatTwoArgDest implements DecodeFormat {
 	public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) throws VMError {
 		int operand = (instructionHigh >> 20) & 0x0F;
 		Opmode.dest().put4(vm, operand, value);
+	}
+
+	@Override
+	public long compile(Object[] args, int line) throws CompileError {
+		if (args.length==0) throw new CompileError(Language.getCurrent().localize("err.validate.NotEnoughArgs"), line);
+		if (args.length >2) throw new CompileError(Language.getCurrent().localize("err.validate.tooManyArgs"), line);
+		
+		if (args.length==1) {
+			//try d == a
+			//This is actually a common case, as with FSIN F0 or ABS R4
+			if (args[0] instanceof RegisterToken) {
+				long operand = ((RegisterToken) args[0]).ordinal();
+				if (operand>15) {
+					throw new CompileError(Language.getCurrent().localize("err.validate.destOperandRequired"), line);
+				}
+				long result = 0L;
+				result |= ((long)operand) << 52;
+				result |= ((long)Opmode.REGISTER) << 32;
+				result |= ((long)operand);
+				return result;
+			} else {
+				throw new CompileError(Language.getCurrent().localize("err.validate.destOperandRequired"), line);
+			}
+			
+		} else if (args.length==2) {
+			//Most proper case.
+			
+			//d param
+			if (!(args[0] instanceof RegisterToken)) throw new CompileError(Language.getCurrent().localize("err.validate.destOperandRequired"), line);
+			long d = ((RegisterToken)args[0]).ordinal();
+			if (d>15) throw new CompileError(Language.getCurrent().localize("err.validate.destOperandRequired"), line);
+			long result = 0L;
+			result |= ((long)d) << 52;
+			
+			//a param
+			if (args[1] instanceof RegisterToken) {
+				long a = ((RegisterToken)args[1]).ordinal();
+				result |= ((long)Opmode.REGISTER) << 32;
+				result |= a;
+			} else if (args[1] instanceof Integer) {
+				long a = ((Integer) args[1]).intValue();
+				result |= ((long)Opmode.IMMEDIATE) << 32;
+				result |= a;
+			} else if (args[1] instanceof Float) {
+				long a = Float.floatToIntBits(((Float) args[1]).floatValue());
+				result |= ((long)Opmode.IMMEDIATE) << 32;
+				result |= a;
+			}
+			
+			return result;
+		}
+		
+		throw new IllegalStateException("Compiler validation error!");
 	}
 
 }

@@ -25,6 +25,7 @@
 package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
+import com.unascribed.copu.compiler.CompileError;
 import com.unascribed.copu.undefined.VMError;
 
 public class DecodeFormatThreeArgRM implements DecodeFormat {
@@ -61,6 +62,11 @@ public class DecodeFormatThreeArgRM implements DecodeFormat {
 		int operand = (instructionLow >> 4) & 0b0000_1111_1111_1111;
 		Opmode opmode = Opmode.forId(opmodeId);
 		opmode.put12(vm, operand, value);
+	}
+
+	@Override
+	public long compile(Object[] args, int line) throws CompileError {
+		throw new CompileError("Not yet implemented.", line);
 	}
 
 }

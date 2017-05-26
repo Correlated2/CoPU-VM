@@ -51,10 +51,10 @@ public class MemoryPage {
 	}
 	
 	public int get(int addr) throws VMError {
-		int a = getByte(addr);
-		int b = getByte(addr+1);
-		int c = getByte(addr+2);
-		int d = getByte(addr+3);
+		int a = getByte(addr  ) & 0xFF;
+		int b = getByte(addr+1) & 0xFF;
+		int c = getByte(addr+2) & 0xFF;
+		int d = getByte(addr+3) & 0xFF;
 		return (a << 24) | (b << 16) | (c << 8) | (d << 0);
 	}
 	

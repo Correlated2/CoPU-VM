@@ -25,8 +25,10 @@
 package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
+import com.unascribed.copu.compiler.CompileError;
+import com.unascribed.copu.compiler.Label;
+import com.unascribed.copu.compiler.RegisterToken;
 import com.unascribed.copu.undefined.VMError;
-import com.unascribed.copu.undefined.VMKernelPanic;
 
 public class DecodeFormatTwoArgRM implements DecodeFormat {
 
@@ -59,6 +61,55 @@ public class DecodeFormatTwoArgRM implements DecodeFormat {
 		Opmode opmode = Opmode.forId((instructionHigh >> 16) & 0x0F);
 		int operand = (instructionHigh >> 4) & 0b0000_1111_1111_1111;
 		opmode.put12(vm, operand, value);
+	}
+
+	@Override
+	public long compile(Object[] args, int line) throws CompileError {
+		if (args.length>2) throw new CompileError("Too many arguments.", line);
+		if (args.length<1) throw new CompileError("Too few arguments.", line);
+		
+		Object dObj = args[0];
+		Object aObj = (args.length==1) ? dObj : args[1];
+		
+		long result = 0L;
+		long a = 0L;
+		long opmodeD = 0L;
+		long d = 0L;
+		
+		if (aObj instanceof RegisterToken) {
+			a = ((RegisterToken) aObj).ordinal();
+			a |= ((long)Opmode.REGISTER) << 32;
+		} else if (aObj instanceof Integer) {
+			a = ((Integer)aObj).longValue();
+			a |= ((long)Opmode.IMMEDIATE) << 32;
+		} else if (aObj instanceof Float) {
+			a = Float.floatToIntBits(((Float)aObj).floatValue());
+			a |= ((long)Opmode.IMMEDIATE) << 32;
+		} else if (aObj instanceof Label) {
+			a = ((Label)aObj).value;
+			a |= ((long)Opmode.IMMEDIATE_ADDRESS) << 32;
+		} else {
+			throw new CompileError("WAT", line);
+			//TODO: Throw a fit
+		}
+		
+		if (dObj instanceof RegisterToken) {
+			d = ((RegisterToken)dObj).ordinal();
+			d |= ((long)Opmode.REGISTER) << 12;
+		} else {
+			throw new CompileError("WAT", line);
+			//TODO: Throw a fit
+		}
+		
+		//Just to be safe, make sure we can't clobber bits we don't own.
+		a &= 0xFFFFFFFFFL;
+		d &= 0xFFFF;
+		
+		//Stuff them into the A param
+		result |= (a);
+		result |= (d << 36);
+		
+		return result;
 	}
 
 }
