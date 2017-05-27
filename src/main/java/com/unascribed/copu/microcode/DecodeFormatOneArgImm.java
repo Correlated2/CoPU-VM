@@ -26,7 +26,8 @@ package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
 import com.unascribed.copu.compiler.CompileError;
-import com.unascribed.copu.compiler.ZeroPageAddress;
+import com.unascribed.copu.compiler.ImmediateValue;
+import com.unascribed.copu.compiler.Operand;
 import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMKernelPanic;
 
@@ -53,23 +54,11 @@ public class DecodeFormatOneArgImm implements DecodeFormat {
 	}
 
 	@Override
-	public long compile(Object[] args, int line) throws CompileError {
-		if (args.length>1) throw new CompileError("Too many arguments.", line);
-		if (args.length<1) throw new CompileError("Too few arguments.", line);
+	public long compile(Operand[] args) throws CompileError {
+		if (args.length>1) throw CompileError.withKey("err.validate.tooManyArgs");
+		if (args.length<1) throw CompileError.withKey("err.validate.notEnoughArgs");
+		if (!(args[0] instanceof ImmediateValue)) throw CompileError.withKey("err.validate.mustBeImmediate");
 		
-		Object a = args[0];
-		long operand = 0L;
-		
-		if (a instanceof Integer) {
-			operand = ((Integer) a).longValue();
-		} else if (a instanceof Float) {
-			operand = Float.floatToIntBits(((Float)a).floatValue());
-		} else if (a instanceof ZeroPageAddress) {
-			operand = ((ZeroPageAddress)a).value;
-		}
-		
-		operand &= 0xFFFFFFFF;
-		
-		return operand;
+		return args[0].as32Bit() & 0xFFFFFFFFL;
 	}
 }

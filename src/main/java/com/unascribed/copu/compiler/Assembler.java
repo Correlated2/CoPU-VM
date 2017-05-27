@@ -114,20 +114,20 @@ public class Assembler {
 		
 		String[] args = new String[0];
 		if (!rest.isEmpty()) args = rest.split(",");
-		Object[] arguments = new Object[args.length];
+		Operand[] arguments = new Operand[args.length];
 		for(int i=0; i<args.length; i++) {
 			arguments[i] = parseArgument(args[i]);
 		}
 		
 		String parsedLine = opcode.name();
-		for(Object o : arguments) {
+		for(Operand o : arguments) {
 			parsedLine += ' ';
 			parsedLine += o.toString();
 		}
 		
 		System.out.println("Parsed: "+parsedLine);
 		
-		long filledOpcode = opcode.getDecodeFormat().compile(arguments, lineNum);
+		long filledOpcode = opcode.getDecodeFormat().compile(arguments);
 		filledOpcode |= ((long)opcode.value()) << 56;
 		
 		try {
@@ -145,7 +145,7 @@ public class Assembler {
 		return result;
 	}
 	
-	public Object parseArgument(String a) throws IllegalArgumentException {
+	public Operand parseArgument(String a) throws IllegalArgumentException {
 		if (a==null) return null;
 		String arg = a.trim();
 		if (arg.isEmpty()) return null;
@@ -155,7 +155,7 @@ public class Assembler {
 			//if it contains a period it's a float, otherwise int.
 			try {
 				if (arg.contains(".")) {
-					return Float.valueOf(arg);
+					return  new ImmediateValue(Float.valueOf(arg));
 				} else {
 					//Negative signs will screw with detecting other radixes. Detect them early and strip them
 					int mul = 1;
@@ -166,11 +166,11 @@ public class Assembler {
 					
 					if (arg.startsWith("0x")) {
 						arg = arg.substring(2);
-						return Integer.parseInt(arg,16)*mul;
+						return  new ImmediateValue(Integer.parseInt(arg,16)*mul);
 					} else if (arg.startsWith("0b")) {
-						return Integer.parseInt(arg,2)*mul;
+						return new ImmediateValue(Integer.parseInt(arg,2)*mul);
 					} else {
-						return Integer.parseInt(arg)*mul;
+						return new ImmediateValue(Integer.parseInt(arg)*mul);
 					}
 				}
 			} catch (Throwable t) {

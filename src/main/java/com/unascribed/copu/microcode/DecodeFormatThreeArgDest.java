@@ -26,6 +26,7 @@ package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
 import com.unascribed.copu.compiler.CompileError;
+import com.unascribed.copu.compiler.Operand;
 import com.unascribed.copu.undefined.VMError;
 
 public class DecodeFormatThreeArgDest implements DecodeFormat {
@@ -60,12 +61,15 @@ public class DecodeFormatThreeArgDest implements DecodeFormat {
 	}
 
 	@Override
-	public long compile(Object[] args, int line) throws CompileError {
-		if (args.length<2) throw new CompileError("Not enough arguments.", line);
+	public long compile(Operand[] args) throws CompileError {
+		if (args.length<2) throw CompileError.withKey("err.validate.notEnoughArgs");
+		if (args.length>3) throw CompileError.withKey("err.validate.tooManyArgs");
 		
-		throw new CompileError("Not yet implemented.", line);
+		Operand d = args[0];
+		Operand a = (args.length==3) ? args[1] : d;
+		Operand b = (args.length==3) ? args[2] : args[1];
 		
-		
+		return (d.as4Bit() << 52) | (a.as12Bit() << 36) | (b.as32Bit());
 	}
 
 }

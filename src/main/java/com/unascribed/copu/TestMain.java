@@ -1,7 +1,5 @@
 package com.unascribed.copu;
 
-import java.util.Arrays;
-
 import com.unascribed.copu.compiler.CompileError;
 import com.unascribed.copu.compiler.Assembler;
 import com.unascribed.copu.undefined.VMError;
@@ -19,7 +17,6 @@ public class TestMain {
 			"NOP",
 			"FSIN F2, 3.1415927",
 			"NOP",
-			//"JMP 0",
 			"MOV R0, 0",
 			"HALT"
 	};
@@ -47,7 +44,12 @@ public class TestMain {
 			}
 		} catch (VMError err) {
 			System.out.println(err.getMessage());
-			//err.printStackTrace();
 		}
+		
+		System.out.println("REGISTER FILE DUMP");
+		for(Register reg : machine.registers().table) {
+			System.out.print(Integer.toHexString(reg.get())+"\t");
+		}
+		System.out.println();
 	}
 }

@@ -1,6 +1,8 @@
 package com.unascribed.copu.compiler;
 
-public enum RegisterToken {
+import com.unascribed.copu.microcode.Opmode;
+
+public enum RegisterToken implements Operand {
 	R0, R1, R2, R3, R4, R5, R6, R7,
 	X, Y,
 	PG0, PG1,
@@ -19,5 +21,29 @@ public enum RegisterToken {
 	
 	public boolean isRegister(String s) {
 		return forName(s)!=null;
+	}
+
+	@Override
+	public long as4Bit() throws CompileError {
+		if (this.ordinal()>15) throw CompileError.withKey("err.validate.destOperandRequired");
+		return this.ordinal();
+	}
+
+	@Override
+	public long as12Bit() throws CompileError {
+		long result = Opmode.REGISTER;
+		result = result << 12;
+		result |= this.ordinal();
+		
+		return result;
+	}
+
+	@Override
+	public long as32Bit() throws CompileError {
+		long result = Opmode.REGISTER;
+		result = result << 32;
+		result |= this.ordinal();
+		
+		return result;
 	}
 }

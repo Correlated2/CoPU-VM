@@ -26,6 +26,7 @@ package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
 import com.unascribed.copu.compiler.CompileError;
+import com.unascribed.copu.compiler.Operand;
 import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMKernelPanic;
 
@@ -44,7 +45,7 @@ public interface DecodeFormat {
 	public int loadA(VirtualMachine vm, int instructionHigh, int instructionLow) throws VMError;
 	public int loadB(VirtualMachine vm, int instructionHigh, int instructionLow) throws VMError;
 	public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) throws VMError;
-	public long compile(Object[] args, int line) throws CompileError;
+	public long compile(Operand[] args) throws CompileError;
 	
 	public static class NullDecodeFormat implements DecodeFormat {
 		@Override
@@ -66,8 +67,8 @@ public interface DecodeFormat {
 		}
 
 		@Override
-		public long compile(Object[] args, int line) throws CompileError {
-			if (args.length>0) throw new CompileError("Too many arguments.", line);
+		public long compile(Operand[] args) throws CompileError {
+			if (args.length>0) throw CompileError.withKey("err.validate.tooManyArgs");
 			return 0L;
 		}
 	}

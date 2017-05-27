@@ -26,8 +26,7 @@ package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
 import com.unascribed.copu.compiler.CompileError;
-import com.unascribed.copu.compiler.ZeroPageAddress;
-import com.unascribed.copu.compiler.RegisterToken;
+import com.unascribed.copu.compiler.Operand;
 import com.unascribed.copu.undefined.VMError;
 
 public class DecodeFormatTwoArgRM implements DecodeFormat {
@@ -64,52 +63,14 @@ public class DecodeFormatTwoArgRM implements DecodeFormat {
 	}
 
 	@Override
-	public long compile(Object[] args, int line) throws CompileError {
-		if (args.length>2) throw new CompileError("Too many arguments.", line);
-		if (args.length<1) throw new CompileError("Too few arguments.", line);
+	public long compile(Operand[] args) throws CompileError {
+		if (args.length==0) throw CompileError.withKey("err.validate.NotEnoughArgs");
+		if (args.length >2) throw CompileError.withKey("err.validate.tooManyArgs");
 		
-		Object dObj = args[0];
-		Object aObj = (args.length==1) ? dObj : args[1];
-		
-		long result = 0L;
-		long a = 0L;
-		long opmodeD = 0L;
-		long d = 0L;
-		
-		if (aObj instanceof RegisterToken) {
-			a = ((RegisterToken) aObj).ordinal();
-			a |= ((long)Opmode.REGISTER) << 32;
-		} else if (aObj instanceof Integer) {
-			a = ((Integer)aObj).longValue();
-			a |= ((long)Opmode.IMMEDIATE) << 32;
-		} else if (aObj instanceof Float) {
-			a = Float.floatToIntBits(((Float)aObj).floatValue());
-			a |= ((long)Opmode.IMMEDIATE) << 32;
-		} else if (aObj instanceof ZeroPageAddress) {
-			a = ((ZeroPageAddress)aObj).value;
-			a |= ((long)Opmode.IMMEDIATE_ADDRESS) << 32;
-		} else {
-			throw new CompileError("WAT", line);
-			//TODO: Throw a fit
-		}
-		
-		if (dObj instanceof RegisterToken) {
-			d = ((RegisterToken)dObj).ordinal();
-			d |= ((long)Opmode.REGISTER) << 12;
-		} else {
-			throw new CompileError("WAT", line);
-			//TODO: Throw a fit
-		}
-		
-		//Just to be safe, make sure we can't clobber bits we don't own.
-		a &= 0xFFFFFFFFFL;
-		d &= 0xFFFF;
-		
-		//Stuff them into the A param
-		result |= (a);
-		result |= (d << 36);
-		
-		return result;
+		Operand d = args[0];
+		Operand a = (args.length==1) ? d : args[1];
+
+		return (d.as12Bit() << 36) | a.as32Bit();
 	}
 
 }

@@ -49,6 +49,7 @@ public class Language {
 		en.define("err.validate.tooManyArgs",   "Too many arguments.");
 		en.define("err.validate.destOperandRequired", "This argument only accepts certain registers (R0-R7, F0-F3, PG0-PG1)"); //and X and Y >:)
 		en.define("err.validate.argTooLarge", "Argument is too large.");
+		en.define("err.validate.mustBeImmediate", "Argument must be an immediate value.");
 		en.define("err.assembler.wrongType", "Type mismatch in operand.");
 		en.define("err.assembler.wrongPacking.4", "Cannot pack this data into a 4-bit operand.");
 		en.define("err.assembler.wrongPacking.12", "Cannot pack this data into a 12-bit operand.");
