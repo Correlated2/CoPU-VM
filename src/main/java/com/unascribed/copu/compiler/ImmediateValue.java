@@ -42,7 +42,7 @@ public class ImmediateValue implements Operand {
 	@Override
 	public String toString() {
 		String result = Integer.toHexString(value);
-		while(result.length()<8) result = ' '+result;
-		return result;
+		while(result.length()<8) result = '0'+result;
+		return "0x"+result;
 	}
 }

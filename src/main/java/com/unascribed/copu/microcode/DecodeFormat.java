@@ -41,10 +41,11 @@ public interface DecodeFormat {
 	public static final DecodeFormat THREE_ARG_DEST = new DecodeFormatThreeArgDest();
 	public static final DecodeFormat THREE_ARG_MULTI_DEST = new DecodeFormatThreeArgMultiDest();
 	
-	public int getCost(int instructionHigh, int instructionLow);
-	public int loadA(VirtualMachine vm, int instructionHigh, int instructionLow) throws VMError;
-	public int loadB(VirtualMachine vm, int instructionHigh, int instructionLow) throws VMError;
-	public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) throws VMError;
+	public int getCost(int high, int low);
+	public int loadA(VirtualMachine vm, int high, int low) throws VMError;
+	public int loadB(VirtualMachine vm, int high, int low) throws VMError;
+	public int loadD(VirtualMachine vm, int high, int low) throws VMError;
+	public void setDest(VirtualMachine vm, int high, int low, int value) throws VMError;
 	public long compile(Operand[] args) throws CompileError;
 	
 	public static class NullDecodeFormat implements DecodeFormat {
@@ -54,15 +55,20 @@ public interface DecodeFormat {
 		}
 		
 		@Override
-		public int loadA(VirtualMachine vm, int instructionHigh, int instructionLow) {
+		public int loadA(VirtualMachine vm, int high, int low) {
 			throw new VMKernelPanic("Attempted to load 'a' arg for no-arg instruction!");
 		}
 		@Override
-		public int loadB(VirtualMachine vm, int instructionHigh, int instructionLow) {
+		public int loadB(VirtualMachine vm, int high, int low) {
 			throw new VMKernelPanic("Attempted to load 'b' arg for no-arg instruction!");
 		}
 		@Override
-		public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) {
+		public int loadD(VirtualMachine vm, int high, int low) throws VMError {
+			throw new VMKernelPanic("Attempted to load 'd' arg for no-arg instruction!");
+		}
+		
+		@Override
+		public void setDest(VirtualMachine vm, int high, int low, int value) {
 			throw new VMKernelPanic("Attempted to set dest for no-arg instruction!");
 		}
 
@@ -71,5 +77,7 @@ public interface DecodeFormat {
 			if (args.length>0) throw CompileError.withKey("err.validate.tooManyArgs");
 			return 0L;
 		}
+
+		
 	}
 }

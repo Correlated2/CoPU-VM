@@ -30,6 +30,8 @@ import com.unascribed.copu.microcode.InstructionADD;
 import com.unascribed.copu.microcode.InstructionDIV;
 import com.unascribed.copu.microcode.InstructionFSIN;
 import com.unascribed.copu.microcode.InstructionHALT;
+import com.unascribed.copu.microcode.InstructionJEQ;
+import com.unascribed.copu.microcode.InstructionJL;
 import com.unascribed.copu.microcode.InstructionJMP;
 import com.unascribed.copu.microcode.InstructionMOD;
 import com.unascribed.copu.microcode.InstructionMOV;
@@ -51,12 +53,12 @@ public enum Opcode {
 	JSR (0x08, DecodeFormat.ONE_ARG),
 	RET (0x09, DecodeFormat.NO_ARG),
 	
-	JEQ (0x0A, DecodeFormat.THREE_ARG_MULTI_DEST), //JZ
-	JGE (0x0B, DecodeFormat.THREE_ARG_MULTI_DEST), //JNL
-	JLE (0x0C, DecodeFormat.THREE_ARG_MULTI_DEST), //JNG
-	JL  (0x0D, DecodeFormat.THREE_ARG_MULTI_DEST), 
-	JG  (0x0E, DecodeFormat.THREE_ARG_MULTI_DEST),
-	JNE (0x0F, DecodeFormat.THREE_ARG_MULTI_DEST), //JNZ
+	JEQ (0x0A, DecodeFormat.THREE_ARG_DEST, new InstructionJEQ()), //JZ
+	JGE (0x0B, DecodeFormat.THREE_ARG_DEST), //JNL
+	JLE (0x0C, DecodeFormat.THREE_ARG_DEST), //JNG
+	JL  (0x0D, DecodeFormat.THREE_ARG_DEST, new InstructionJL()), 
+	JG  (0x0E, DecodeFormat.THREE_ARG_DEST),
+	JNE (0x0F, DecodeFormat.THREE_ARG_DEST), //JNZ
 	
 	MOV (0x10, DecodeFormat.TWO_ARG_RM, new InstructionMOV()),
 	//0x11-0x17 reserved for MOV-type

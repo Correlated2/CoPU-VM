@@ -56,6 +56,13 @@ public class DecodeFormatTwoArgRM implements DecodeFormat {
 	}
 
 	@Override
+	public int loadD(VirtualMachine vm, int high, int low) throws VMError {
+		Opmode opmode = Opmode.forId((high >> 16) & 0x0F);
+		int operand = (high >> 4) & 0b0000_1111_1111_1111;
+		return opmode.get12(vm, operand);
+	}
+	
+	@Override
 	public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) throws VMError {
 		Opmode opmode = Opmode.forId((instructionHigh >> 16) & 0x0F);
 		int operand = (instructionHigh >> 4) & 0b0000_1111_1111_1111;
@@ -72,5 +79,4 @@ public class DecodeFormatTwoArgRM implements DecodeFormat {
 
 		return (d.as12Bit() << 36) | a.as32Bit();
 	}
-
 }

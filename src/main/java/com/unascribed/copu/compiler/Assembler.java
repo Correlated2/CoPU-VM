@@ -122,7 +122,7 @@ public class Assembler {
 		String parsedLine = opcode.name();
 		for(Operand o : arguments) {
 			parsedLine += ' ';
-			parsedLine += o.toString();
+			parsedLine += o;
 		}
 		
 		System.out.println("Parsed: "+parsedLine);
@@ -185,6 +185,44 @@ public class Assembler {
 		RegisterToken reg = RegisterToken.forName(arg);
 		if (reg!=null) return reg;
 		
+		if (arg.toLowerCase().startsWith("mem[")) {
+			//System.out.println("Assembling memory argument "+arg);
+			String addrString = arg.substring(4);
+			if (addrString.endsWith("]")) {
+				addrString = addrString.substring(0, addrString.length()-1);
+				//System.out.println("Trying to parse memory argument: "+addrString);
+				try {
+					Operand o = parseArgument(addrString);
+					
+					if (o instanceof ImmediateValue) {
+						//System.out.println("Immediate Address");
+						return new ZeroPageAddress(((ImmediateValue)o).value);
+					} else if (o instanceof RegisterToken) {
+						return new DirectAddress(RegisterToken.CS, (RegisterToken)o);
+					}
+				} catch (IllegalArgumentException ex) {
+					//Argument is probably in the form MEM[S:R]
+					//This will get a LOT crazier when syntax like MEM[S:(R)] and MEM[S:R+4] are implemented
+					if (arg.contains(":")) {
+						String[] pieces = arg.split(":");
+						if (pieces.length!=2) throw new IllegalArgumentException("Invalid syntax in memory address parameter '"+arg+"'.");
+						Operand s = parseArgument(pieces[0]);
+						Operand r = parseArgument(pieces[1]);
+						if (!(s instanceof RegisterToken)) throw new IllegalArgumentException("first parameter in a multi-param memory address must be a segment register");
+						if (r instanceof ImmediateValue) {
+							//like MEM[S:42]
+						} else if (r instanceof RegisterToken) {
+							//Like MEM[S:R]
+						}
+					} else {
+						//For now we can't parse it.
+						
+					}
+				}
+				
+				
+			} else throw new IllegalArgumentException("Invalid syntax in memory parameter '"+arg+"'.");
+		}
 		
 		return null;
 	}

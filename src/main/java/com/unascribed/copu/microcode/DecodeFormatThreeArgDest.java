@@ -34,29 +34,36 @@ public class DecodeFormatThreeArgDest implements DecodeFormat {
 	/* [CCCC CCCC dddd AAAA aaaa aaaa aaaa BBBB|bbbb bbbb bbbb bbbb bbbb bbbb bbbb bbbb] */
 	
 	@Override
-	public int getCost(int instructionHigh, int instructionLow) throws VMError {
-		Opmode opmodeA = Opmode.forId((instructionHigh >> 16) & 0x0F);
-		Opmode opmodeB = Opmode.forId(instructionHigh & 0x0F);
+	public int getCost(int high, int low) throws VMError {
+		Opmode opmodeA = Opmode.forId((high >> 16) & 0x0F);
+		Opmode opmodeB = Opmode.forId(high & 0x0F);
 		return opmodeA.getCost() + opmodeB.getCost();
 	}
 	
 	@Override
-	public int loadA(VirtualMachine vm, int instructionHigh, int instructionLow) throws VMError {
-		int opmodeId = (instructionHigh >> 16) & 0x0F;
-		int operand = (instructionLow >> 4) & 0b0000_1111_1111_1111;
+	public int loadA(VirtualMachine vm, int high, int low) throws VMError {
+		int opmodeId = (high >> 16) & 0x0F;
+		int operand = (high >> 4) & 0b0000_1111_1111_1111;
 		Opmode opmode = Opmode.forId(opmodeId);
 		return opmode.get12(vm, operand);
 	}
 
 	@Override
-	public int loadB(VirtualMachine vm, int instructionHigh, int instructionLow) throws VMError {
-		Opmode opmode = Opmode.forId(instructionHigh & 0x0F);
-		return opmode.get32(vm, instructionLow);
+	public int loadB(VirtualMachine vm, int high, int low) throws VMError {
+		Opmode opmode = Opmode.forId(high & 0x0F);
+		return opmode.get32(vm, low);
 	}
 
 	@Override
-	public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) throws VMError {
-		int operand = (instructionHigh >> 20) & 0x0F;
+	public int loadD(VirtualMachine vm, int high, int low) throws VMError {
+		int operand = (high >> 20) & 0x0F;
+		Opmode opmode = Opmode.dest();
+		return opmode.get4(vm, operand);
+	}
+	
+	@Override
+	public void setDest(VirtualMachine vm, int high, int low, int value) throws VMError {
+		int operand = (high >> 20) & 0x0F;
 		Opmode.dest().put4(vm, operand, value);
 	}
 
@@ -71,5 +78,7 @@ public class DecodeFormatThreeArgDest implements DecodeFormat {
 		
 		return (d.as4Bit() << 52) | (a.as12Bit() << 36) | (b.as32Bit());
 	}
+
+	
 
 }

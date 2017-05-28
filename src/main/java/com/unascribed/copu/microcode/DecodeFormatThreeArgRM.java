@@ -58,6 +58,14 @@ public class DecodeFormatThreeArgRM implements DecodeFormat {
 	}
 
 	@Override
+	public int loadD(VirtualMachine vm, int high, int low) throws VMError {
+		int opmodeId = (high >> 16) & 0x0F;
+		int operand = (low >> 4) & 0b0000_1111_1111_1111;
+		Opmode opmode = Opmode.forId(opmodeId);
+		return opmode.get12(vm, operand);
+	}
+	
+	@Override
 	public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) throws VMError {
 		int opmodeId = (instructionHigh >> 16) & 0x0F;
 		int operand = (instructionLow >> 4) & 0b0000_1111_1111_1111;

@@ -14,9 +14,10 @@ public class TestMain {
 	};*/
 	
 	public static String[] testPreCompile = {
-			"NOP",
-			"FSIN F2, 3.1415927",
-			"NOP",
+			"MOV R0, 1",
+			"ADD R1, R0",
+			"ADD R0, 1",
+			"JL R0, 11, MEM[8]",
 			"MOV R0, 0",
 			"HALT"
 	};

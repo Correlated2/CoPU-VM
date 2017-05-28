@@ -54,9 +54,15 @@ public class DecodeFormatOneArgDest implements DecodeFormat {
 	}
 
 	@Override
-	public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) throws VMError {
-		int regId = (instructionHigh >> 20) & 0x0F;
-		vm.getRegister(regId).accept(value);
+	public int loadD(VirtualMachine vm, int high, int low) throws VMError {
+		int operand = (high >> 20) & 0x0F;
+		return Opmode.dest().get4(vm, operand);
+	}
+	
+	@Override
+	public void setDest(VirtualMachine vm, int high, int low, int value) throws VMError {
+		int operand = (high >> 20) & 0x0F;
+		Opmode.dest().put4(vm, operand, value);
 	}
 
 	@Override
@@ -66,5 +72,4 @@ public class DecodeFormatOneArgDest implements DecodeFormat {
 		
 		return args[0].as4Bit() << 52;
 	}
-
 }

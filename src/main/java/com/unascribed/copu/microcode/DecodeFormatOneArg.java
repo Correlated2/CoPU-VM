@@ -55,6 +55,11 @@ public class DecodeFormatOneArg implements DecodeFormat {
 	}
 
 	@Override
+	public int loadD(VirtualMachine vm, int high, int low) throws VMError {
+		throw new VMKernelPanic("Tried to load nonexistant 'd' operand of a 1-arg instruction");
+	}
+	
+	@Override
 	public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) throws VMError {
 		Opmode opmode = Opmode.forId(instructionHigh & 0x0F);
 		opmode.put32(vm, instructionLow, value);
@@ -67,4 +72,6 @@ public class DecodeFormatOneArg implements DecodeFormat {
 		
 		return args[0].as32Bit();
 	}
+
+	
 }

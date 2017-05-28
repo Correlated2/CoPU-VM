@@ -52,6 +52,12 @@ public class DecodeFormatThreeArgMultiDest implements DecodeFormat {
 	}
 
 	@Override
+	public int loadD(VirtualMachine vm, int high, int low) throws VMError {
+		int operand = (high >> 20) & 0x0F;
+		return Opmode.dest().get4(vm, operand);
+	}
+	
+	@Override
 	public void setDest(VirtualMachine vm, int instructionHigh, int instructionLow, int value) throws VMError  {
 		int operand = (instructionHigh >> 20) & 0x0F;
 		Opmode.dest().put4(vm, operand, value);
@@ -68,5 +74,4 @@ public class DecodeFormatThreeArgMultiDest implements DecodeFormat {
 		
 		return (d.as4Bit() << 52) | (a.as4Bit() << 48) | (b.as32Bit());
 	}
-
 }
