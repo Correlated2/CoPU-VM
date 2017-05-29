@@ -27,7 +27,7 @@ package com.unascribed.copu.microcode;
 import com.unascribed.copu.MemoryPage;
 import com.unascribed.copu.Register;
 import com.unascribed.copu.VirtualMachine;
-import com.unascribed.copu.compiler.ZeroPageAddress;
+import com.unascribed.copu.assembler.ZeroPageAddress;
 import com.unascribed.copu.undefined.VMError;
 
 public class OpmodeImmediateAddress extends Opmode {

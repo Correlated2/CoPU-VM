@@ -1,7 +1,5 @@
 package com.unascribed.copu;
 
-import com.unascribed.copu.compiler.AssembleError;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,18 +13,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.StreamSupport;
 
-import com.unascribed.copu.compiler.Assembler;
+import com.unascribed.copu.assembler.AssembleError;
+import com.unascribed.copu.assembler.Assembler;
 import com.unascribed.copu.undefined.VMError;
 
 public class Copu {
-	/*
-	public static byte[] testProgram = {
-			0x02, 0x11, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, //ADD R0, R0, R0
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //NOP
-	 (byte) 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //HALT
-			0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //JMP IMM[0]
-	};*/
-	
+
 	public static String[] testPreCompile = {
 			"MOV R0, 1",
 			"ADD R1, R0",

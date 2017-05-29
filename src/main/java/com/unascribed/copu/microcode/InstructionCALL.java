@@ -32,13 +32,10 @@ public class InstructionCALL implements Instruction {
 
 	@Override
 	public int run(VirtualMachine vm, DecodeFormat format, int high, int low) {
-		int moduleNamePtr = format.loadA(vm, high, low);
-		int methodNamePtr = format.loadB(vm, high, low);
+		int symbol = format.loadA(vm, high, low);
+		CallRegistry.execute(vm, symbol);
 		
-		//TODO: Write up syntactic sugar to load up a String from a MemoryPage
-		//TODO: Write a module registry
-		//TODO: Rethink whether module names should be Strings or symbolic constant integers
-		return 0;
+		return HardwareLimits.COST_MODULE_CALL;
 	}
 
 }

@@ -1,4 +1,4 @@
-package com.unascribed.copu.compiler;
+package com.unascribed.copu.assembler;
 
 public class ImmediateValue implements Operand {
 	public int bitWidth;

@@ -49,7 +49,7 @@ import com.unascribed.copu.microcode.InstructionSHL;
 
 public enum Opcode {
 	NOP (0x00, DecodeFormat.NO_ARG, new InstructionNOP()),
-	CALL(0x01, DecodeFormat.TWO_ARG_RM),
+	CALL(0x01, DecodeFormat.ONE_ARG_IMM),
 	
 	ADD (0x02, DecodeFormat.THREE_ARG_DEST, new InstructionADD()),
 	MUL (0x03, DecodeFormat.THREE_ARG_DEST, new InstructionMUL()),

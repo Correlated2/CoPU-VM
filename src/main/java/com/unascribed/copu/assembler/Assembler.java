@@ -1,4 +1,4 @@
-package com.unascribed.copu.compiler;
+package com.unascribed.copu.assembler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;

@@ -1,4 +1,4 @@
-package com.unascribed.copu.compiler;
+package com.unascribed.copu.assembler;
 
 public interface Operand {
 	public long as4Bit() throws AssembleError;

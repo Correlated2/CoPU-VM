@@ -25,8 +25,8 @@
 package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
-import com.unascribed.copu.compiler.AssembleError;
-import com.unascribed.copu.compiler.Operand;
+import com.unascribed.copu.assembler.AssembleError;
+import com.unascribed.copu.assembler.Operand;
 import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMKernelPanic;
 

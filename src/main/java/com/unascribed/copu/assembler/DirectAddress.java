@@ -1,4 +1,4 @@
-package com.unascribed.copu.compiler;
+package com.unascribed.copu.assembler;
 
 public class DirectAddress implements Operand {
 	public RegisterToken page;

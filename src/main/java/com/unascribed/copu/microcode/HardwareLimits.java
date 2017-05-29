@@ -6,7 +6,7 @@ public class HardwareLimits {
 	//These values are fairly sane and realistic, and also quite subject to change.
 	public static final int COST_FPU = 5;
 	public static final int COST_FPU_TRIG = 80;
-	public static final int COST_MODULE_LOAD = 32; //Assuming it's from ROM. A fast disk would be in the thousands of cycles.
+	public static final int COST_MODULE_CALL = 200; //Assuming it's from ROM. A fast disk would be in the thousands of cycles.
 	public static final int COST_BRANCH_STALL = PIPELINE_DEPTH;
 	public static final int COST_MEMORY_ACCESS_BYTE = 1;
 	public static final int COST_MEMORY_ACCESS_WORD = 1;
