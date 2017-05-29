@@ -19,7 +19,7 @@ public class TestMain {
 			"ADD R0, 1",
 			"JL R0, 11, MEM[8]",
 			"MOV R0, 0",
-			"HALT"
+			"RET"
 	};
 	
 	public static void main(String[] args) {

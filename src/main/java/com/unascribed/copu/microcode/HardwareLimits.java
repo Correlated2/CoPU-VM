@@ -10,4 +10,6 @@ public class HardwareLimits {
 	public static final int COST_BRANCH_STALL = PIPELINE_DEPTH;
 	public static final int COST_MEMORY_ACCESS_BYTE = 1;
 	public static final int COST_MEMORY_ACCESS_WORD = 1;
+	
+	public static final int STACK_DEPTH = 64;
 }

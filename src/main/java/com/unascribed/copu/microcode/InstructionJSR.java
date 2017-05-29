@@ -3,14 +3,14 @@ package com.unascribed.copu.microcode;
 import com.unascribed.copu.VirtualMachine;
 import com.unascribed.copu.undefined.VMUserspaceError;
 
-public class InstructionPOP implements Instruction {
+public class InstructionJSR implements Instruction {
 
 	@Override
 	public int run(VirtualMachine vm, DecodeFormat format, int high, int low) {
-		if (vm.stack().isEmpty()) throw new VMUserspaceError("Stack underflow.");
-		int data = vm.stack().pop();
-		format.setDest(vm, high, low, data);
+		vm.stack().push(vm.registers().IP.get());
+		if (vm.stack().size()>HardwareLimits.STACK_DEPTH) throw new VMUserspaceError("Stack overflow.");
+		vm.registers().IP.accept(format.loadA(vm, high, low));
 		return format.getCost(high, low);
 	}
-	
+
 }
