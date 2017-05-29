@@ -2,7 +2,7 @@ package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
 
-public class InstructionJL implements Instruction {
+public class InstructionJLE implements Instruction {
 
 	@Override
 	public int run(VirtualMachine vm, DecodeFormat format, int high, int low) {

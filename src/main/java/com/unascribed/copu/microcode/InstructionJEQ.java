@@ -6,8 +6,8 @@ public class InstructionJEQ implements Instruction {
 
 	@Override
 	public int run(VirtualMachine vm, DecodeFormat format, int high, int low) {
-		boolean zf = (format.loadD(vm, high, low) - format.loadA(vm, high, low)) == 0;
-		if (zf) {
+		boolean branch = (format.loadD(vm, high, low) == format.loadA(vm, high, low));
+		if (branch) {
 			vm.registers().IP.accept( format.loadB(vm, high, low) );
 		}
 		return HardwareLimits.COST_BRANCH_STALL + format.getCost(high, low);

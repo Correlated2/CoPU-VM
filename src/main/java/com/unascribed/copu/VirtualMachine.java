@@ -37,6 +37,7 @@ public class VirtualMachine {
 	private MemoryPage[] localDescriptorTable = new MemoryPage[16];
 	private ArrayDeque<Integer> stack = new ArrayDeque<>();
 	private int cooldown = HardwareLimits.COST_BRANCH_STALL; //There's been no chance to fill the pipeline.
+	private long cycles = 0L;
 	
 	public RegisterFile registers() {
 		return registers;
@@ -65,6 +66,8 @@ public class VirtualMachine {
 	}
 	
 	public void runCycle() throws VMError {
+		cycles++;
+		
 		if (cooldown<=0) {
 			int cs = registers.CS.get();
 			int ip = registers.IP.get();
@@ -85,5 +88,9 @@ public class VirtualMachine {
 			}
 		}
 		cooldown--;
+	}
+	
+	public long getCycleCount() {
+		return cycles;
 	}
 }

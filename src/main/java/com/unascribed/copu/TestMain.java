@@ -39,6 +39,7 @@ public class TestMain {
 		VirtualMachine machine = new VirtualMachine();
 		machine.loadProgram(program);
 		
+		long startMillis = System.currentTimeMillis();
 		try {
 			while(true) {
 				machine.runCycle();
@@ -46,6 +47,8 @@ public class TestMain {
 		} catch (VMError err) {
 			System.out.println(err.getMessage());
 		}
+		long elapsed = System.currentTimeMillis() - startMillis;
+		System.out.println("Total machine cycles:"+machine.getCycleCount()+" elapsed:"+elapsed+"msec");
 		
 		System.out.println("REGISTER FILE DUMP");
 		for(Register reg : machine.registers().table) {
