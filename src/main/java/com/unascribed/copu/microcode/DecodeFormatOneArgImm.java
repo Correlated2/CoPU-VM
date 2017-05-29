@@ -25,7 +25,7 @@
 package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
-import com.unascribed.copu.compiler.CompileError;
+import com.unascribed.copu.compiler.AssembleError;
 import com.unascribed.copu.compiler.ImmediateValue;
 import com.unascribed.copu.compiler.Operand;
 import com.unascribed.copu.undefined.VMError;
@@ -59,10 +59,10 @@ public class DecodeFormatOneArgImm implements DecodeFormat {
 	}
 
 	@Override
-	public long compile(Operand[] args) throws CompileError {
-		if (args.length>1) throw CompileError.withKey("err.validate.tooManyArgs");
-		if (args.length<1) throw CompileError.withKey("err.validate.notEnoughArgs");
-		if (!(args[0] instanceof ImmediateValue)) throw CompileError.withKey("err.validate.mustBeImmediate");
+	public long compile(Operand[] args) throws AssembleError {
+		if (args.length>1) throw AssembleError.withKey("err.validate.tooManyArgs");
+		if (args.length<1) throw AssembleError.withKey("err.validate.notEnoughArgs");
+		if (!(args[0] instanceof ImmediateValue)) throw AssembleError.withKey("err.validate.mustBeImmediate");
 		
 		return args[0].as32Bit() & 0xFFFFFFFFL;
 	}

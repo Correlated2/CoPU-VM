@@ -25,7 +25,7 @@
 package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
-import com.unascribed.copu.compiler.CompileError;
+import com.unascribed.copu.compiler.AssembleError;
 import com.unascribed.copu.compiler.Operand;
 import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMKernelPanic;
@@ -64,9 +64,9 @@ public class DecodeFormatTwoArgDest implements DecodeFormat {
 	}
 
 	@Override
-	public long compile(Operand[] args) throws CompileError {
-		if (args.length==0) throw CompileError.withKey("err.validate.NotEnoughArgs");
-		if (args.length >2) throw CompileError.withKey("err.validate.tooManyArgs");
+	public long compile(Operand[] args) throws AssembleError {
+		if (args.length==0) throw AssembleError.withKey("err.validate.NotEnoughArgs");
+		if (args.length >2) throw AssembleError.withKey("err.validate.tooManyArgs");
 		
 		Operand d = (Operand)args[0];
 		Operand a = (args.length==2) ? (Operand)args[1] : (Operand)args[0];

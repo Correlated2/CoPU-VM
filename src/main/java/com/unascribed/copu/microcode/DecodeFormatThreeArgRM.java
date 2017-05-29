@@ -25,7 +25,7 @@
 package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
-import com.unascribed.copu.compiler.CompileError;
+import com.unascribed.copu.compiler.AssembleError;
 import com.unascribed.copu.compiler.Operand;
 import com.unascribed.copu.undefined.VMError;
 
@@ -74,9 +74,9 @@ public class DecodeFormatThreeArgRM implements DecodeFormat {
 	}
 
 	@Override
-	public long compile(Operand[] args) throws CompileError {
-		if (args.length<2) throw CompileError.withKey("err.validate.notEnoughArgs");
-		if (args.length>3) throw CompileError.withKey("err.validate.tooManyArgs");
+	public long compile(Operand[] args) throws AssembleError {
+		if (args.length<2) throw AssembleError.withKey("err.validate.notEnoughArgs");
+		if (args.length>3) throw AssembleError.withKey("err.validate.tooManyArgs");
 		
 		Operand d = args[0];
 		Operand a = (args.length==3) ? args[1] : d;

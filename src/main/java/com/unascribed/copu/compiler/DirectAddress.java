@@ -13,12 +13,12 @@ public class DirectAddress implements Operand {
 	public RegisterToken getOffset() { return offset; }
 
 	@Override
-	public long as4Bit() throws CompileError {
-		throw CompileError.withKey("err.assembler.wrongPacking.4");
+	public long as4Bit() throws AssembleError {
+		throw AssembleError.withKey("err.assembler.wrongPacking.4");
 	}
 
 	@Override
-	public long as12Bit() throws CompileError {
+	public long as12Bit() throws AssembleError {
 		long result = 1L << 12;
 		result |= ((long)page.ordinal()) << 7;
 		result |= ((long)offset.ordinal());
@@ -27,7 +27,7 @@ public class DirectAddress implements Operand {
 	}
 
 	@Override
-	public long as32Bit() throws CompileError {
+	public long as32Bit() throws AssembleError {
 		long result = 1L << 32;
 		result |= ((long)page.ordinal()) << 27;
 		result |= ((long)offset.ordinal());

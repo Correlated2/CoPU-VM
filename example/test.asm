@@ -1,0 +1,6 @@
+MOV R0, 1
+ADD R1, R0
+ADD R0, 1
+JL R0, 11, MEM[8]
+MOV R0, 0
+RET

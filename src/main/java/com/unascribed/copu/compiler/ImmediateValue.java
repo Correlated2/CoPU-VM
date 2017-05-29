@@ -23,19 +23,19 @@ public class ImmediateValue implements Operand {
 	}
 
 	@Override
-	public long as4Bit() throws CompileError {
-		throw CompileError.withKey("err.assembler.wrongPacking.4");
+	public long as4Bit() throws AssembleError {
+		throw AssembleError.withKey("err.assembler.wrongPacking.4");
 	}
 
 	@Override
-	public long as12Bit() throws CompileError {
-		if (bitWidth>12) throw CompileError.withKey("err.validate.argTooLarge");
+	public long as12Bit() throws AssembleError {
+		if (bitWidth>12) throw AssembleError.withKey("err.validate.argTooLarge");
 		
 		return ((long)value) & 0b1111_1111_1111L; //Opmode.IMMEDATE is zero
 	}
 
 	@Override
-	public long as32Bit() throws CompileError {
+	public long as32Bit() throws AssembleError {
 		return ((long)value) & 0xFFFFFFFFL;
 	}
 	

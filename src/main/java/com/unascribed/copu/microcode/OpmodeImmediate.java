@@ -25,7 +25,7 @@
 package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
-import com.unascribed.copu.compiler.CompileError;
+import com.unascribed.copu.compiler.AssembleError;
 import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMKernelPanic;
 
@@ -66,23 +66,23 @@ public class OpmodeImmediate extends Opmode {
 	}
 	
 	@Override
-	public long assemble12(Object o) throws CompileError {
+	public long assemble12(Object o) throws AssembleError {
 		if (o instanceof Integer) {
 			long operand = ((Integer) o).intValue();
-			if (operand>0xFF_FFFF) throw CompileError.withKey("err.validate.argTooLarge");
+			if (operand>0xFF_FFFF) throw AssembleError.withKey("err.validate.argTooLarge");
 			operand |= (((long)Opmode.IMMEDIATE) << 12);
 			return operand;
 		}
 		if (o instanceof Float) {
 			//Can never fit immediate float in 12-bit fields.
-			throw CompileError.withKey("err.validate.argTooLarge");
+			throw AssembleError.withKey("err.validate.argTooLarge");
 		}
 		
-		throw CompileError.withKey("err.assembler.wrongType");
+		throw AssembleError.withKey("err.assembler.wrongType");
 	}
 	
 	@Override
-	public long assemble32(Object o) throws CompileError {
+	public long assemble32(Object o) throws AssembleError {
 		if (o instanceof Integer) {
 			long operand = ((Integer) o).intValue();
 			operand &= 0xFFFF_FFFFL;
@@ -96,6 +96,6 @@ public class OpmodeImmediate extends Opmode {
 			return operand;
 		}
 		
-		throw CompileError.withKey("err.assembler.wrongType");
+		throw AssembleError.withKey("err.assembler.wrongType");
 	}
 }

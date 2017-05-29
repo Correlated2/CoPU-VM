@@ -24,13 +24,13 @@ public enum RegisterToken implements Operand {
 	}
 
 	@Override
-	public long as4Bit() throws CompileError {
-		if (this.ordinal()>15) throw CompileError.withKey("err.validate.destOperandRequired");
+	public long as4Bit() throws AssembleError {
+		if (this.ordinal()>15) throw AssembleError.withKey("err.validate.destOperandRequired");
 		return this.ordinal();
 	}
 
 	@Override
-	public long as12Bit() throws CompileError {
+	public long as12Bit() throws AssembleError {
 		long result = Opmode.REGISTER;
 		result = result << 12;
 		result |= this.ordinal();
@@ -39,7 +39,7 @@ public enum RegisterToken implements Operand {
 	}
 
 	@Override
-	public long as32Bit() throws CompileError {
+	public long as32Bit() throws AssembleError {
 		long result = Opmode.REGISTER;
 		result = result << 32;
 		result |= this.ordinal();

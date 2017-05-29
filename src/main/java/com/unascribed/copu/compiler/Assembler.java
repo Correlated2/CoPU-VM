@@ -16,7 +16,7 @@ public class Assembler {
 	private DataOutputStream output = new DataOutputStream(result);
 	private HashMap<String, Integer> namedAddresses = new HashMap<>();
 	
-	public void parse(String[] input) throws CompileError {
+	public void parse(String[] input) throws AssembleError {
 		int lineNum = 1;
 		for(String s : input) {
 			String[] lines = s.split("\\n");
@@ -27,7 +27,7 @@ public class Assembler {
 		}
 	}
 	
-	public void parseLine(String line, int lineNum) throws CompileError {
+	public void parseLine(String line, int lineNum) throws AssembleError {
 		line = line.trim(); //Kill leading and trailing whitespace
 		if (line.contains("\n")) line = line.split("\\n")[0]; //Strip any additional lines
 		if (line.contains(";")) { //Strip comments
@@ -99,7 +99,7 @@ public class Assembler {
 		}
 	}
 	
-	private void parseOpcodeLine(String opName, String rest, int lineNum) throws CompileError {
+	private void parseOpcodeLine(String opName, String rest, int lineNum) throws AssembleError {
 		for(Opcode opcode : Opcode.values()) {
 			if (opcode.name().toLowerCase().equals(opName)) {
 				parseOpcodeLine(opcode, rest, lineNum);
@@ -109,7 +109,7 @@ public class Assembler {
 		throw new IllegalArgumentException("Unknown opcode '"+opName+"' at line "+lineNum+".");
 	}
 	
-	private void parseOpcodeLine(Opcode opcode, String rest, int lineNum) throws CompileError {
+	private void parseOpcodeLine(Opcode opcode, String rest, int lineNum) throws AssembleError {
 		rest = rest.trim();
 		
 		String[] args = new String[0];
@@ -121,21 +121,25 @@ public class Assembler {
 		
 		String parsedLine = opcode.name();
 		for(Operand o : arguments) {
-			parsedLine += ' ';
+			parsedLine += '\t';
 			parsedLine += o;
 		}
 		
-		System.out.println("Parsed: "+parsedLine);
-		
-		long filledOpcode = opcode.getDecodeFormat().compile(arguments);
-		filledOpcode |= ((long)opcode.value()) << 56;
-		
 		try {
-			System.out.println("Emitting opcode "+longToHex(filledOpcode));
-			
-			output.writeLong(filledOpcode);
-		} catch (IOException ex) {
-			//Never happens in a byteArrayOutputStream
+			long filledOpcode = opcode.getDecodeFormat().compile(arguments);
+			filledOpcode |= ((long)opcode.value()) << 56;
+		
+		
+			try {
+				System.out.println(longToHex(filledOpcode)+"\t"+parsedLine);
+				
+				output.writeLong(filledOpcode);
+			} catch (IOException ex) {
+				//Never happens in a byteArrayOutputStream
+			}
+		} catch (AssembleError ex) {
+			ex.setLine(lineNum);
+			throw new AssembleError(ex.getMessage(), lineNum, ex);
 		}
 	}
 	

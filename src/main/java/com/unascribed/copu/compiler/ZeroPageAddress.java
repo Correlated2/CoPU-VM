@@ -15,12 +15,12 @@ public class ZeroPageAddress implements Operand {
 	}
 	
 	@Override
-	public long as4Bit() throws CompileError {
-		throw CompileError.withKey("err.assembler.wrongPacking.4");
+	public long as4Bit() throws AssembleError {
+		throw AssembleError.withKey("err.assembler.wrongPacking.4");
 	}
 	
 	@Override
-	public long as12Bit() throws CompileError {
+	public long as12Bit() throws AssembleError {
 		long result = Opmode.IMMEDIATE_ADDRESS;
 		result = result << 12;
 		result |= ((long)value) & 0b0111_1111_1111L;
@@ -29,7 +29,7 @@ public class ZeroPageAddress implements Operand {
 	}
 	
 	@Override
-	public long as32Bit() throws CompileError {
+	public long as32Bit() throws AssembleError {
 		long result = Opmode.IMMEDIATE_ADDRESS;
 		result = result << 32;
 		result |= ((long)value) & 0b0111_1111_1111L;

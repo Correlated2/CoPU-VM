@@ -26,7 +26,7 @@ package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.Language;
 import com.unascribed.copu.VirtualMachine;
-import com.unascribed.copu.compiler.CompileError;
+import com.unascribed.copu.compiler.AssembleError;
 import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMKernelPanic;
 
@@ -83,15 +83,15 @@ public abstract class Opmode {
 		return false;
 	}
 	
-	public long assemble4(Object o) throws CompileError {
-		throw CompileError.withKey("err.assembler.wrongPacking.4");
+	public long assemble4(Object o) throws AssembleError {
+		throw AssembleError.withKey("err.assembler.wrongPacking.4");
 	}
 	
-	public long assemble12(Object o) throws CompileError {
-		throw CompileError.withKey("err.assembler.wrongPacking.12");
+	public long assemble12(Object o) throws AssembleError {
+		throw AssembleError.withKey("err.assembler.wrongPacking.12");
 	}
 	
-	public long assemble32(Object o) throws CompileError {
-		throw CompileError.withKey("err.assembler.wrongPacking.32");
+	public long assemble32(Object o) throws AssembleError {
+		throw AssembleError.withKey("err.assembler.wrongPacking.32");
 	}
 }

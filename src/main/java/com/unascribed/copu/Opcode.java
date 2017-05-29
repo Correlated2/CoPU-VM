@@ -57,9 +57,9 @@ public enum Opcode {
 	MOD (0x05, DecodeFormat.THREE_ARG_DEST, new InstructionMOD()),
 	SHL (0x06, DecodeFormat.THREE_ARG_DEST, new InstructionSHL()), //SHL, SHR
 	
-	JMP (0x07, DecodeFormat.ONE_ARG, new InstructionJMP()),
-	JSR (0x08, DecodeFormat.ONE_ARG, new InstructionJSR()),
-	RET (0x09, DecodeFormat.NO_ARG,  new InstructionRET()),
+	JMP (0x07, DecodeFormat.ONE_ARG,        new InstructionJMP()),
+	JSR (0x08, DecodeFormat.ONE_ARG,        new InstructionJSR()),
+	RET (0x09, DecodeFormat.NO_ARG,         new InstructionRET()),
 	
 	JEQ (0x0A, DecodeFormat.THREE_ARG_DEST, new InstructionJEQ()), //JZ
 	JGE (0x0B, DecodeFormat.THREE_ARG_DEST, new InstructionJGE()), //JNL
@@ -98,7 +98,7 @@ public enum Opcode {
 	
 	RISE(0x9A, DecodeFormat.NO_ARG), //Undocumented. Discovered in dead code in the factory ROM that might have been called in certain rare cases, triggering a hostile robot uprising.
 	
-	INT (0xFE, DecodeFormat.ONE_ARG_IMM),
+	INT (0xFE, DecodeFormat.ONE_ARG_IMM, new InstructionHALT()),
 	HALT(0xFF, DecodeFormat.NO_ARG, new InstructionHALT())
 	;
 	private final int value;

@@ -38,6 +38,7 @@ public class VirtualMachine {
 	private ArrayDeque<Integer> stack = new ArrayDeque<>();
 	private int cooldown = HardwareLimits.COST_BRANCH_STALL; //There's been no chance to fill the pipeline.
 	private long cycles = 0L;
+	private boolean pedantic = false;
 	
 	public RegisterFile registers() {
 		return registers;
@@ -82,7 +83,7 @@ public class VirtualMachine {
 				throw new VMUserspaceError("Invalid instruction at MEM[CS:"+
 					Integer.toHexString(ip)+ "]");
 			} else {
-				System.out.println("VMExec: MEM["+Integer.toHexString(ip)+"]("+Integer.toHexString(opid)+"): "+opcode.name());
+				if (pedantic) System.out.println("MEM["+Integer.toHexString(ip)+"]: "+opcode.name());
 				int cost = opcode.exec(this, high, low);
 				cooldown += cost;
 			}
