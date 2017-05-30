@@ -26,8 +26,6 @@ package com.unascribed.copu.microcode;
 
 import com.unascribed.copu.VirtualMachine;
 
-/** @Deprecated for now this instruction is a fancy NOP */
-@Deprecated
 public class InstructionCALL implements Instruction {
 
 	@Override

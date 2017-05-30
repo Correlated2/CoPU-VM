@@ -27,6 +27,15 @@ public class Assembler {
 		}
 	}
 	
+	public static int firstWhitespaceIndex(String s) {
+		int space = s.indexOf(' ');
+		int tab = s.indexOf('\t');
+		if (space==-1 && tab==-1) return -1;
+		if (space==-1) return tab;
+		if (tab==-1) return space;
+		return Math.min(space, tab);
+	}
+	
 	public void parseLine(String line, int lineNum) throws AssembleError {
 		line = line.trim(); //Kill leading and trailing whitespace
 		if (line.contains("\n")) line = line.split("\\n")[0]; //Strip any additional lines
@@ -39,7 +48,8 @@ public class Assembler {
 		String opName = line;
 		String rest = "";
 		
-		int opEnd = line.indexOf(' '); //Opcode ends at the first whitespace character
+		int opEnd = firstWhitespaceIndex(line); //Opcode ends at the first whitespace character
+		
 		if (opEnd>0) {
 			opName = line.substring(0, opEnd);
 			if (line.length()>opEnd+1) {
@@ -55,6 +65,9 @@ public class Assembler {
 			//Do const things
 		} else if (isDataLine(opName)){
 			parseDataLine(opName, rest, lineNum);
+		} else if (opName.endsWith(":")) {
+			namedAddresses.put(opName.substring(0,opName.length()-1), output.size());
+			if (!rest.isEmpty()) parseLine(rest, lineNum);
 		} else {
 			parseOpcodeLine(opName, rest, lineNum);
 		}

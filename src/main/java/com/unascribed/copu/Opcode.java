@@ -26,7 +26,9 @@ package com.unascribed.copu;
 
 import com.unascribed.copu.microcode.DecodeFormat;
 import com.unascribed.copu.microcode.Instruction;
+import com.unascribed.copu.microcode.InstructionABS;
 import com.unascribed.copu.microcode.InstructionADD;
+import com.unascribed.copu.microcode.InstructionCALL;
 import com.unascribed.copu.microcode.InstructionDIV;
 import com.unascribed.copu.microcode.InstructionFSIN;
 import com.unascribed.copu.microcode.InstructionHALT;
@@ -41,15 +43,17 @@ import com.unascribed.copu.microcode.InstructionJSR;
 import com.unascribed.copu.microcode.InstructionMOD;
 import com.unascribed.copu.microcode.InstructionMOV;
 import com.unascribed.copu.microcode.InstructionMUL;
+import com.unascribed.copu.microcode.InstructionNEG;
 import com.unascribed.copu.microcode.InstructionNOP;
 import com.unascribed.copu.microcode.InstructionPOP;
 import com.unascribed.copu.microcode.InstructionPUSH;
 import com.unascribed.copu.microcode.InstructionRET;
 import com.unascribed.copu.microcode.InstructionSHL;
+import com.unascribed.copu.microcode.InstructionXOR;
 
 public enum Opcode {
 	NOP (0x00, DecodeFormat.NO_ARG, new InstructionNOP()),
-	CALL(0x01, DecodeFormat.ONE_ARG_IMM),
+	CALL(0x01, DecodeFormat.ONE_ARG_IMM, new InstructionCALL()),
 	
 	ADD (0x02, DecodeFormat.THREE_ARG_DEST, new InstructionADD()),
 	MUL (0x03, DecodeFormat.THREE_ARG_DEST, new InstructionMUL()),
@@ -90,9 +94,9 @@ public enum Opcode {
 	//0x2B-0x2F reserved for floating-point instructions
 	
 	LSL (0x30, DecodeFormat.THREE_ARG_DEST), //LSL, LSR
-	ABS (0x31, DecodeFormat.TWO_ARG_DEST),
-	NEG (0x32, DecodeFormat.TWO_ARG_DEST), //Identical to MUL B, A, -1
-	XOR (0x33, DecodeFormat.THREE_ARG_DEST),
+	ABS (0x31, DecodeFormat.TWO_ARG_DEST, new InstructionABS()),
+	NEG (0x32, DecodeFormat.TWO_ARG_DEST, new InstructionNEG()), //Identical to MUL B, A, -1
+	XOR (0x33, DecodeFormat.THREE_ARG_DEST, new InstructionXOR()),
 	
 	//0x34-0xFD are all undefined behavior
 	
