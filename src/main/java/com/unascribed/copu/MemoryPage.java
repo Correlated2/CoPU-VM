@@ -24,6 +24,8 @@
 
 package com.unascribed.copu;
 
+import java.nio.charset.StandardCharsets;
+
 import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMPageFault;
 
@@ -88,5 +90,41 @@ public class MemoryPage {
 		setByte(addr+1, b);
 		setByte(addr+2, c);
 		setByte(addr+3, d);
+	}
+	
+	/* While at first glance it looks like we could do Strings more cleanly
+	 * with a StringBuilder byte-by-byte, that method will screw up surrogate
+	 * pairs. So instead, we assemble byte[]'s and ask java to assemble /
+	 * disassemble the String using UTF_8 rules. Suddenly our VM supports
+	 * unicode(!)
+	 */
+	
+	
+	public String readString(int addr, int limit) {
+		if (limit>PAGE_SIZE) limit=PAGE_SIZE;
+		
+		
+		byte[] bytes = new byte[limit];
+		for(int i=0; i<limit; i++) {
+			int cur = (byte)getByte(addr+i);
+			if ((cur & 0xFF) == 0) {
+				if (i==0) return "";
+				return new String(bytes, 0, i, StandardCharsets.UTF_8);
+			}
+			bytes[i] = (byte)cur;
+		}
+		return new String(bytes);
+	}
+	
+	public void writeString(String s, int addr, int limit) {
+		byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
+		int toWrite = Math.min(limit, bytes.length);
+		for(int i=0; i<limit; i++) {
+			if (i<toWrite) {
+				setByte(addr+i, bytes[i]);
+			} else {
+				setByte(addr+i, (byte)0);
+			}
+		}
 	}
 }
