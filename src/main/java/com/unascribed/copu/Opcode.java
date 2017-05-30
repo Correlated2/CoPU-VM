@@ -30,8 +30,18 @@ import com.unascribed.copu.microcode.InstructionABS;
 import com.unascribed.copu.microcode.InstructionADD;
 import com.unascribed.copu.microcode.InstructionCALL;
 import com.unascribed.copu.microcode.InstructionDIV;
+import com.unascribed.copu.microcode.InstructionFABS;
+import com.unascribed.copu.microcode.InstructionFADD;
+import com.unascribed.copu.microcode.InstructionFCOS;
+import com.unascribed.copu.microcode.InstructionFDIV;
+import com.unascribed.copu.microcode.InstructionFMOD;
+import com.unascribed.copu.microcode.InstructionFMUL;
+import com.unascribed.copu.microcode.InstructionFNEG;
 import com.unascribed.copu.microcode.InstructionFSIN;
+import com.unascribed.copu.microcode.InstructionFTAN;
+import com.unascribed.copu.microcode.InstructionFTOI;
 import com.unascribed.copu.microcode.InstructionHALT;
+import com.unascribed.copu.microcode.InstructionITOF;
 import com.unascribed.copu.microcode.InstructionJEQ;
 import com.unascribed.copu.microcode.InstructionJG;
 import com.unascribed.copu.microcode.InstructionJGE;
@@ -52,8 +62,8 @@ import com.unascribed.copu.microcode.InstructionSHL;
 import com.unascribed.copu.microcode.InstructionXOR;
 
 public enum Opcode {
-	NOP (0x00, DecodeFormat.NO_ARG, new InstructionNOP()),
-	CALL(0x01, DecodeFormat.ONE_ARG_IMM, new InstructionCALL()),
+	NOP (0x00, DecodeFormat.NO_ARG,         new InstructionNOP()),
+	CALL(0x01, DecodeFormat.ONE_ARG_IMM,    new InstructionCALL()),
 	
 	ADD (0x02, DecodeFormat.THREE_ARG_DEST, new InstructionADD()),
 	MUL (0x03, DecodeFormat.THREE_ARG_DEST, new InstructionMUL()),
@@ -78,32 +88,32 @@ public enum Opcode {
 	PUSH(0x18, DecodeFormat.ONE_ARG,        new InstructionPUSH()),
 	POP (0x19, DecodeFormat.ONE_ARG_DEST,   new InstructionPOP()),
 	
-	FADD(0x20, DecodeFormat.THREE_ARG_MULTI_DEST),
-	FMUL(0x21, DecodeFormat.THREE_ARG_MULTI_DEST),
-	FDIV(0x22, DecodeFormat.THREE_ARG_MULTI_DEST),
-	FMOD(0x23, DecodeFormat.THREE_ARG_MULTI_DEST),
+	FADD(0x20, DecodeFormat.THREE_ARG_MULTI_DEST, new InstructionFADD()),
+	FMUL(0x21, DecodeFormat.THREE_ARG_MULTI_DEST, new InstructionFMUL()),
+	FDIV(0x22, DecodeFormat.THREE_ARG_MULTI_DEST, new InstructionFDIV()),
+	FMOD(0x23, DecodeFormat.THREE_ARG_MULTI_DEST, new InstructionFMOD()),
 	
-	FABS(0x24, DecodeFormat.TWO_ARG_DEST),
-	FNEG(0x25, DecodeFormat.TWO_ARG_DEST), //Identical to FMUL B, A, -1
-	ITOF(0x26, DecodeFormat.TWO_ARG_DEST), //converts an int to a float and places it into a register
-	FTOI(0x27, DecodeFormat.TWO_ARG_DEST), //converts a float to an int (by truncating it) and places it into a register
+	FABS(0x24, DecodeFormat.TWO_ARG_DEST,   new InstructionFABS()),
+	FNEG(0x25, DecodeFormat.TWO_ARG_DEST,   new InstructionFNEG()), //Identical to FMUL B, A, -1
+	ITOF(0x26, DecodeFormat.TWO_ARG_DEST,   new InstructionITOF()), //converts an int to a float and places it into a register
+	FTOI(0x27, DecodeFormat.TWO_ARG_DEST,   new InstructionFTOI()), //converts a float to an int (by truncating it) and places it into a register
 	
-	FSIN(0x28, DecodeFormat.TWO_ARG_DEST, new InstructionFSIN()),
-	FCOS(0x29, DecodeFormat.TWO_ARG_DEST),
-	FTAN(0x2A, DecodeFormat.TWO_ARG_DEST),
+	FSIN(0x28, DecodeFormat.TWO_ARG_DEST,   new InstructionFSIN()),
+	FCOS(0x29, DecodeFormat.TWO_ARG_DEST,   new InstructionFCOS()),
+	FTAN(0x2A, DecodeFormat.TWO_ARG_DEST,   new InstructionFTAN()),
 	//0x2B-0x2F reserved for floating-point instructions
 	
 	LSL (0x30, DecodeFormat.THREE_ARG_DEST), //LSL, LSR
-	ABS (0x31, DecodeFormat.TWO_ARG_DEST, new InstructionABS()),
-	NEG (0x32, DecodeFormat.TWO_ARG_DEST, new InstructionNEG()), //Identical to MUL B, A, -1
+	ABS (0x31, DecodeFormat.TWO_ARG_DEST,   new InstructionABS()),
+	NEG (0x32, DecodeFormat.TWO_ARG_DEST,   new InstructionNEG()), //Identical to MUL B, A, -1
 	XOR (0x33, DecodeFormat.THREE_ARG_DEST, new InstructionXOR()),
 	
 	//0x34-0xFD are all undefined behavior
 	
 	RISE(0x9A, DecodeFormat.NO_ARG), //Undocumented. Discovered in dead code in the factory ROM that might have been called in certain rare cases, triggering a hostile robot uprising.
 	
-	INT (0xFE, DecodeFormat.ONE_ARG_IMM, new InstructionHALT()),
-	HALT(0xFF, DecodeFormat.NO_ARG, new InstructionHALT())
+	INT (0xFE, DecodeFormat.ONE_ARG_IMM,    new InstructionHALT()),
+	HALT(0xFF, DecodeFormat.NO_ARG,         new InstructionHALT())
 	;
 	private final int value;
 	private final DecodeFormat format;

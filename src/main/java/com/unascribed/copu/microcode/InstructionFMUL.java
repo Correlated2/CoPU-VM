@@ -24,39 +24,18 @@
 
 package com.unascribed.copu.microcode;
 
-import java.util.HashMap;
-
 import com.unascribed.copu.VirtualMachine;
-import com.unascribed.copu.undefined.VMError;
-import com.unascribed.copu.undefined.VMUserspaceError;
 
-public final class CallRegistry {
-	private static HashMap<String, Integer> symbols = new HashMap<>();
-	private static HashMap<Integer, CallHandler> handlers = new HashMap<>();
-	private CallRegistry() {}
-	
-	static {
-		register("sys.malloc", 0x05150001, (it)->{});
+public class InstructionFMUL implements Instruction {
+	@Override
+	public int run(VirtualMachine vm, DecodeFormat format, int high, int low) {
+		float a = Float.intBitsToFloat(format.loadA(vm, high, low));
+		float b = Float.intBitsToFloat(format.loadB(vm, high, low));
 		
+		float result = a * b;
 		
+		format.setDest(vm, high, low, Float.floatToIntBits(result));
 		
-	}
-	
-	public static boolean isRegistered(int constant) {
-		return handlers.containsKey(constant);
-	}
-	
-	public static void register(String symbol, int constant, CallHandler handler) {
-		symbols.put(symbol, constant);
-		handlers.put(constant, handler);
-	}
-	
-	public static void execute(VirtualMachine vm, int constant) throws VMError {
-		CallHandler handler = handlers.get(constant);
-		if (handler!=null) {
-			
-		} else {
-			throw new VMUserspaceError("");
-		}
+		return HardwareLimits.COST_FPU + format.getCost(high, low);
 	}
 }
