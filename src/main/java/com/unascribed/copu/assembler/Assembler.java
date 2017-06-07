@@ -27,9 +27,11 @@ package com.unascribed.copu.assembler;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.unascribed.copu.Opcode;
+import com.unascribed.copu.microcode.CallRegistry;
 
 public class Assembler {
 	private static final String[] dataCodes = {
@@ -39,6 +41,7 @@ public class Assembler {
 	private ByteArrayOutputStream result = new ByteArrayOutputStream();
 	private DataOutputStream output = new DataOutputStream(result);
 	private HashMap<String, Integer> namedAddresses = new HashMap<>();
+	private ArrayList<AssemblyLabel> labelFillIns = new ArrayList<>();
 	
 	public void parse(String[] input) throws AssembleError {
 		int lineNum = 1;
@@ -154,6 +157,13 @@ public class Assembler {
 		Operand[] arguments = new Operand[args.length];
 		for(int i=0; i<args.length; i++) {
 			arguments[i] = parseArgument(args[i]);
+			if (arguments[i] instanceof AssemblyLabel) {
+				if (i==args.length-1) {
+					labelFillIns.add(((AssemblyLabel)arguments[i]).atLine(lineNum));
+				} else {
+					throw new AssembleError("Cannot assemble label \""+arguments[i].toString()+"\". A label should be the last argument in an instruction.");
+				}
+			}
 		}
 		
 		String parsedLine = opcode.name();
@@ -163,6 +173,7 @@ public class Assembler {
 		}
 		
 		try {
+			
 			long filledOpcode = opcode.getDecodeFormat().compile(arguments);
 			filledOpcode |= ((long)opcode.value()) << 56;
 		
@@ -223,6 +234,11 @@ public class Assembler {
 			return new ZeroPageAddress(namedAddresses.get(arg));
 		}
 		
+		int symbol = CallRegistry.getSymbol(arg);
+		if (symbol!=0) {
+			return new ImmediateValue(symbol);
+		}
+		
 		RegisterToken reg = RegisterToken.forName(arg);
 		if (reg!=null) return reg;
 		
@@ -265,7 +281,12 @@ public class Assembler {
 			} else throw new IllegalArgumentException("Invalid syntax in memory parameter '"+arg+"'.");
 		}
 		
-		return null;
+		//It's probably a label we haven't encountered yet
+		return new AssemblyLabel(arg, result.size());
+		//labelFillIns.add(new LabelFillIn(arg, result.size()+1));
+		//return new ZeroPageAddress(0);
+		
+		//return null;
 	}
 	
 	public byte[] toByteArray() {
@@ -274,5 +295,15 @@ public class Assembler {
 		} catch (IOException e) {}
 		
 		return result.toByteArray();
+	}
+	
+	private static class LabelFillIn {
+		public String label;
+		public int offset;
+		
+		public LabelFillIn(String label, int offset) {
+			this.label = label;
+			this.offset = offset;
+		}
 	}
 }

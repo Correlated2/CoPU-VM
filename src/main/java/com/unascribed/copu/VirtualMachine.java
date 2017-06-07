@@ -26,37 +26,62 @@ package com.unascribed.copu;
 
 import java.util.ArrayDeque;
 
+import com.unascribed.copu.descriptor.Descriptor;
+import com.unascribed.copu.descriptor.DescriptorCharacters;
 import com.unascribed.copu.microcode.HardwareLimits;
+import com.unascribed.copu.undefined.UndefinedBehavior;
 import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMKernelPanic;
 import com.unascribed.copu.undefined.VMPageFault;
 import com.unascribed.copu.undefined.VMUserspaceError;
 
 public class VirtualMachine {
+	public static final int DESCRIPTOR_STDIN  = 0;
+	public static final int DESCRIPTOR_STDOUT = 1;
+	public static final int DESCRIPTOR_STDERR = 2;
+	
 	private RegisterFile registers = new RegisterFile();
 	private MemoryPage[] localDescriptorTable = new MemoryPage[16];
+	private Descriptor<?>[] fileDescriptorTable = new Descriptor[16];
 	private ArrayDeque<Integer> stack = new ArrayDeque<>();
 	private int cooldown = HardwareLimits.COST_BRANCH_STALL; //There's been no chance to fill the pipeline.
 	private long cycles = 0L;
 	private boolean pedantic = false;
 	
+	private DescriptorCharacters stdout = new DescriptorCharacters();
+	private DescriptorCharacters stderr = new DescriptorCharacters();
+	
+	public VirtualMachine() {
+		stdout.setConsumer((it)->System.out.println(it));
+		stderr.setConsumer((it)->System.err.println(it));
+		fileDescriptorTable[DESCRIPTOR_STDOUT] = stdout;
+		fileDescriptorTable[DESCRIPTOR_STDERR] = stderr;
+	}
+	
 	public RegisterFile registers() {
 		return registers;
 	}
 	public Register getRegister(int id) throws VMKernelPanic {
-		if (id<0 || id>=registers.table.length) throw new VMKernelPanic("Tried to access invalid register:"+id);
+		if (id<0 || id>=registers.table.length) throw new VMKernelPanic("Tried to access invalid register 0x"+Integer.toHexString(id));
 		return registers.table[id];
 	}
 	
 	public MemoryPage getPage(int descriptor) throws VMPageFault {
-		if (descriptor<0 || descriptor>=localDescriptorTable.length) throw new VMPageFault("Invalid page descriptor "+Integer.toHexString(descriptor));
+		if (descriptor<0 || descriptor>=localDescriptorTable.length) throw new VMPageFault("Invalid page descriptor 0x"+Integer.toHexString(descriptor));
 		
 		MemoryPage result = localDescriptorTable[descriptor];
 		if (result==null) {
 			//TODO: This is the sort of error that typically bricks machines before they can bluescreen. This would be a FANTASTIC opportunity for undefined behavior.
-			throw new VMPageFault("Invalid page descriptor "+Integer.toHexString(descriptor));
+			UndefinedBehavior.engage(this, new VMPageFault("Invalid page descriptor "+Integer.toHexString(descriptor)));
+			return localDescriptorTable[0];
 		}
 		return result;
+	}
+	
+	public Descriptor<?> getDescriptor(int descriptor) {
+		if (descriptor<0 || descriptor>=localDescriptorTable.length) throw new VMPageFault("Invalid file descriptor 0x"+Integer.toHexString(descriptor)); 
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	public ArrayDeque<Integer> stack() { return stack; }
@@ -94,4 +119,6 @@ public class VirtualMachine {
 	public long getCycleCount() {
 		return cycles;
 	}
+	
+	
 }

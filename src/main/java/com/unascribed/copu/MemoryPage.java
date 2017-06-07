@@ -25,7 +25,9 @@
 package com.unascribed.copu;
 
 import java.nio.charset.StandardCharsets;
+import java.util.function.IntConsumer;
 
+import com.unascribed.copu.descriptor.Descriptor;
 import com.unascribed.copu.undefined.VMError;
 import com.unascribed.copu.undefined.VMPageFault;
 
@@ -97,12 +99,38 @@ public class MemoryPage {
 	 * pairs. So instead, we assemble byte[]'s and ask java to assemble /
 	 * disassemble the String using UTF_8 rules. Suddenly our VM supports
 	 * unicode(!)
+	 * 
+	 * String concatenation is still just a matter of copying bytes from
+	 * one String onto the end of another.
+	 * 
+	 * String "length" has two meanings: The byte length of the encoding,
+	 * which I'd prefer to call "size", and the number of code points in
+	 * the String, which we'll actually call "length".
 	 */
 	
+	public void readNullTerminated(int addr, int limit, IntConsumer consumer) {
+		if (limit>PAGE_SIZE) limit=PAGE_SIZE;
+		
+		for(int i=0; i<limit; i++) {
+			int cur = getByte(addr+i);
+			if ((cur & 0xFF) == 0) {
+				return;
+			}
+			consumer.accept(cur);
+		}
+	}
+	
+	public void read(int addr, int limit, IntConsumer consumer) {
+		if (limit>PAGE_SIZE) limit=PAGE_SIZE;
+		
+		for(int i=0; i<limit; i++) {
+			int cur = getByte(addr+i);
+			consumer.accept(cur);
+		}
+	}
 	
 	public String readString(int addr, int limit) {
 		if (limit>PAGE_SIZE) limit=PAGE_SIZE;
-		
 		
 		byte[] bytes = new byte[limit];
 		for(int i=0; i<limit; i++) {
@@ -126,5 +154,9 @@ public class MemoryPage {
 				setByte(addr+i, (byte)0);
 			}
 		}
+	}
+	
+	public void writeNullTerminatedToDescriptor(int addr, int limit, Descriptor<?> dest) {
+		
 	}
 }
