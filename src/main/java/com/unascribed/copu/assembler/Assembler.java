@@ -296,14 +296,4 @@ public class Assembler {
 		
 		return result.toByteArray();
 	}
-	
-	private static class LabelFillIn {
-		public String label;
-		public int offset;
-		
-		public LabelFillIn(String label, int offset) {
-			this.label = label;
-			this.offset = offset;
-		}
-	}
 }
