@@ -138,7 +138,7 @@ public class Copu {
 	
 	private static byte[] compile(String[] program) throws AssembleError {
 		Assembler compiler = new Assembler();
-		compiler.parse(program);
+		compiler.assemble(program);
 		return compiler.toByteArray();
 	}
 	

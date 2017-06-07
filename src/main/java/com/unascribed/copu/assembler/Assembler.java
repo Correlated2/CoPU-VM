@@ -39,11 +39,14 @@ public class Assembler {
 	};
 	
 	private ByteArrayOutputStream result = new ByteArrayOutputStream();
-	private DataOutputStream output = new DataOutputStream(result);
+	private DataOutputStream dataOut = new DataOutputStream(result);
 	private HashMap<String, Integer> namedAddresses = new HashMap<>();
 	private ArrayList<AssemblyLabel> labelFillIns = new ArrayList<>();
+	private byte[] output = new byte[0];
 	
-	public void parse(String[] input) throws AssembleError {
+	public void assemble(String[] input) throws AssembleError {
+		result.reset();
+		
 		int lineNum = 1;
 		for(String s : input) {
 			String[] lines = s.split("\\n");
@@ -52,9 +55,39 @@ public class Assembler {
 				lineNum++;
 			}
 		}
+		try {
+			dataOut.flush();
+		} catch (IOException e) {}
+		output = result.toByteArray();
+		
+		System.out.println("Pass 1 OK, starting pass 2...");
+		for (AssemblyLabel label : labelFillIns) {
+			if (namedAddresses.containsKey(label.name)) {
+				//Fill in the label value
+				int value = namedAddresses.get(label.name);
+				int offset = label.byteOffset+4;
+				System.out.println("Filling in label '"+label.name+"' at ofs:"+label.byteOffset+" as MEM[CS:0x"+Integer.toHexString(value)+"]");
+				fillIn(value, offset);
+				
+			} else {
+				throw new AssembleError("Unknown token \""+label.name+"\"", label.line);
+			}
+		}
 	}
 	
-	public static int firstWhitespaceIndex(String s) {
+	private void fillIn(int value, int offset) {
+		fillInByte((value >> 24) & 0xFF, offset  );
+		fillInByte((value >> 16) & 0xFF, offset+1);
+		fillInByte((value >>  8) & 0xFF, offset+2);
+		fillInByte((value      ) & 0xFF, offset+3);
+	}
+	
+	private void fillInByte(int value, int offset) {
+		if (offset>=output.length) throw new IllegalStateException("Assembler attempted to write past the end of emitted code.");
+		output[offset] = (byte)value;
+	}
+	
+	private static int firstWhitespaceIndex(String s) {
 		int space = s.indexOf(' ');
 		int tab = s.indexOf('\t');
 		if (space==-1 && tab==-1) return -1;
@@ -63,7 +96,7 @@ public class Assembler {
 		return Math.min(space, tab);
 	}
 	
-	public void parseLine(String line, int lineNum) throws AssembleError {
+	private void parseLine(String line, int lineNum) throws AssembleError {
 		line = line.trim(); //Kill leading and trailing whitespace
 		if (line.contains("\n")) line = line.split("\\n")[0]; //Strip any additional lines
 		if (line.contains(";")) { //Strip comments
@@ -93,7 +126,7 @@ public class Assembler {
 		} else if (isDataLine(opName)){
 			parseDataLine(opName, rest, lineNum);
 		} else if (opName.endsWith(":")) {
-			namedAddresses.put(opName.substring(0,opName.length()-1), output.size());
+			namedAddresses.put(opName.substring(0,opName.length()-1), dataOut.size());
 			if (!rest.isEmpty()) parseLine(rest, lineNum);
 		} else {
 			parseOpcodeLine(opName, rest, lineNum);
@@ -113,14 +146,14 @@ public class Assembler {
 		String label = rest.substring(0, labelEnd);
 		String data = "";
 		if (rest.length()> labelEnd+1) data = rest.substring(labelEnd+1).trim();
-		namedAddresses.put(label, output.size()); //output.size() is the current page offset(!)
+		namedAddresses.put(label, dataOut.size()); //output.size() is the current page offset(!)
 		
 		try {
 			if (opName.equals("db") || opName.equals("dc")) {
 				//Character constant
 				if (data.startsWith("\"")) data = data.substring(1,data.length());
 				for(int i=0; i<data.length(); i++) {
-					output.writeByte(data.charAt(i) & 0xFF);
+					dataOut.writeByte(data.charAt(i) & 0xFF);
 				}
 			} else if (opName.equals("dw")) {
 				int w = 0;
@@ -132,7 +165,7 @@ public class Assembler {
 					w = Integer.parseInt(data);
 				}
 				
-				output.writeInt(w);
+				dataOut.writeInt(w);
 			}
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -181,7 +214,7 @@ public class Assembler {
 			try {
 				System.out.println(longToHex(filledOpcode)+"\t"+parsedLine);
 				
-				output.writeLong(filledOpcode);
+				dataOut.writeLong(filledOpcode);
 			} catch (IOException ex) {
 				//Never happens in a byteArrayOutputStream
 			}
@@ -197,7 +230,7 @@ public class Assembler {
 		return result;
 	}
 	
-	public Operand parseArgument(String a) throws IllegalArgumentException {
+	private Operand parseArgument(String a) throws IllegalArgumentException, AssembleError {
 		if (a==null) return null;
 		String arg = a.trim();
 		if (arg.isEmpty()) return null;
@@ -256,6 +289,8 @@ public class Assembler {
 						return new ZeroPageAddress(((ImmediateValue)o).value);
 					} else if (o instanceof RegisterToken) {
 						return new DirectAddress(RegisterToken.CS, (RegisterToken)o);
+					} else {
+						throw new AssembleError("Cannot understand memory parameter \""+o.toString()+"\"");
 					}
 				} catch (IllegalArgumentException ex) {
 					//Argument is probably in the form MEM[S:R]
@@ -282,7 +317,7 @@ public class Assembler {
 		}
 		
 		//It's probably a label we haven't encountered yet
-		return new AssemblyLabel(arg, result.size());
+		return new AssemblyLabel(arg, dataOut.size());
 		//labelFillIns.add(new LabelFillIn(arg, result.size()+1));
 		//return new ZeroPageAddress(0);
 		
@@ -290,10 +325,11 @@ public class Assembler {
 	}
 	
 	public byte[] toByteArray() {
-		try {
-			output.flush();
+		/*try {
+			dataOut.flush();
 		} catch (IOException e) {}
 		
-		return result.toByteArray();
+		return result.toByteArray();*/
+		return output;
 	}
 }

@@ -46,4 +46,9 @@ public class AssemblyLabel implements Operand {
 		//Logic outside this will handle the fill-in. Use zero for now.
 		return 0;
 	}
+	
+	@Override
+	public String toString() {
+		return this.name;
+	}
 }

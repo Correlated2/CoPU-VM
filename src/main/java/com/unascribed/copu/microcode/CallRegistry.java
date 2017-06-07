@@ -64,7 +64,7 @@ public final class CallRegistry {
 	public static void execute(VirtualMachine vm, int constant) throws VMError {
 		CallHandler handler = handlers.get(constant);
 		if (handler!=null) {
-			
+			handler.doCall(vm);
 		} else {
 			throw new VMUserspaceError("");
 		}

@@ -80,8 +80,7 @@ public class VirtualMachine {
 	
 	public Descriptor<?> getDescriptor(int descriptor) {
 		if (descriptor<0 || descriptor>=localDescriptorTable.length) throw new VMPageFault("Invalid file descriptor 0x"+Integer.toHexString(descriptor)); 
-		// TODO Auto-generated method stub
-		return null;
+		return fileDescriptorTable[descriptor];
 	}
 	
 	public ArrayDeque<Integer> stack() { return stack; }
@@ -114,6 +113,11 @@ public class VirtualMachine {
 			}
 		}
 		cooldown--;
+	}
+	
+	public void cleanup() {
+		stdout.flush();
+		stderr.flush();
 	}
 	
 	public long getCycleCount() {

@@ -42,6 +42,7 @@ public class DescriptorCharacters implements Descriptor<String> {
 	
 	@Override
 	public void flush() {
+
 		String result = new String(stream.toByteArray(), StandardCharsets.UTF_8);
 		stream.reset();
 		if (consumer!=null) consumer.accept(result);

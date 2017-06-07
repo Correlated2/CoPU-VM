@@ -116,7 +116,7 @@ public class MemoryPage {
 			if ((cur & 0xFF) == 0) {
 				return;
 			}
-			consumer.accept(cur);
+			if (consumer!=null) consumer.accept(cur);
 		}
 	}
 	
