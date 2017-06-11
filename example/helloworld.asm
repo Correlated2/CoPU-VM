@@ -15,6 +15,6 @@ start:
 		MOV R1, str       ; offset of string
 		MOV R2, 13        ; string is 13 bytes
 		MOV R3, 1         ; stdout descriptor
-		CALL 0x05150006   ; sys.writeln
+		CALL sys.println  ; make the call
 		MOV R0, 0         ; exit code 0
 		RET               ; return to OS control
